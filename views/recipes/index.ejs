@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipes</title>
+</head>
+
+<body>
+    <h1>All Recipes</h1>
+    <ul>
+        <% for (let recipe of recipes){%>
+        <li><%= recipe.title %></li>
+        <% }%>
+    </ul>
+
+</body>
+
+</html>

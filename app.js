@@ -20,11 +20,10 @@ app.get('/', (req, res) => {
     res.render('home')
 });
 
-app.get('/makerecipe', async (req,res) => {
-    const recipe = new Recipe({title: "Apple pie", description: "lorem  ipsum"});
-    await recipe.save();
-    res.send(recipe)
-})
+app.get('/recipes', async (req, res) => {
+    const recipes = await Recipe.find({});
+    res.render('recipes/index', { recipes });
+});
 
 app.listen(3000, () => {
     console.log('Serving on port 3000')
