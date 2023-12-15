@@ -25,6 +25,12 @@ app.get('/recipes', async (req, res) => {
     res.render('recipes/index', { recipes });
 });
 
+app.get('/recipes/:id', async (req, res,) => {
+    const recipe = await Recipe.findById(req.params.id)
+    res.render('recipes/show', { recipe });
+});
+
+
 app.listen(3000, () => {
     console.log('Serving on port 3000')
 })

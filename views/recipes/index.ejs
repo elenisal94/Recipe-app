@@ -11,7 +11,7 @@
     <h1>All Recipes</h1>
     <ul>
         <% for (let recipe of recipes){%>
-        <li><%= recipe.title %></li>
+            <li><a href="/recipes/<%= recipe._id %>"><%= recipe.title %></a></li>
         <% }%>
     </ul>
 
