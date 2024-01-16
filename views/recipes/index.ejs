@@ -9,10 +9,15 @@
 
 <body>
     <h1>All Recipes</h1>
+    <div>
+        <a href="/recipes/new">Add Recipe</a>
+    </div>
     <ul>
         <% for (let recipe of recipes){%>
-            <li><a href="/recipes/<%= recipe._id %>"><%= recipe.title %></a></li>
-        <% }%>
+            <li><a href="/recipes/<%= recipe._id %>">
+                    <%= recipe.title %>
+                </a></li>
+            <% }%>
     </ul>
 
 </body>

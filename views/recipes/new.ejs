@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Recipe</title>
+</head>
+
+<body>
+
+    <form id="recipeForm" action="/recipes" method="POST">
+
+        <h1>Add a new recipe!</h1>
+        <label for="title">Recipe name:</label>
+        <input type="text" id="title" name="recipe[title]" placeholder="e.g. Divine turkey steak" required>
+
+        <div>
+            <label for="country">Recipe origin country:</label>
+            <select name="recipe[country]" id="country" required>
+                <% Object.entries(countryInfoData).forEach(([code, country])=> { %>
+                    <option value="<%= code %>" <%=code==='Unknown' ? ' selected' : '' %>>
+                        <%= country.countryFullname %>
+                            <%= country.countryFlag %>
+                    </option>
+                    <% }); %>
+            </select>
+        </div>
+
+        <div>
+            <h3>Preparation Time</h3>
+            <select id="prepHours" name="recipe[prepHours]">
+                <option value="0" selected>-</option>
+                <% for (let i=1; i <=48; i++) { %>
+                    <option value="<%= i %>">
+                        <%= i %>
+                    </option>
+                    <% } %>
+            </select>
+            <label for="prepHours">hours</label>
+            <select id="prepMinutes" name="recipe[prepMinutes]" placeholder="minutes">
+                <option value="0" selected>-</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+                <option value="35">35</option>
+                <option value="40">40</option>
+                <option value="45">45</option>
+                <option value="50">50</option>
+                <option value="55">55</option>
+            </select>
+            <label for="prepMinutes">minutes</label>
+        </div>
+
+        <div>
+            <h3>Servings</h3>
+            <label for="serves">Serves</label>
+            <select id="serves" name="recipe[serves]" required>
+                <option value="0" selected>-</option>
+                <% for (let i=1; i <=15; i++) { %>
+                    <option value="<%= i %>">
+                        <%= i %>
+                    </option>
+                    <% } %>
+            </select>
+        </div>
+
+        <div>
+            <h3>Description</h3>
+            <label for="description">Briefly describe this recipe (4 sentences max.)</label>
+            <div><textarea id="description" name="recipe[description]" rows="10" cols="50" maxlength="200" required
+                    placeholder="E.g. Savor the delicious combination of expertly seasoned pan-seared turkey steaks paired with al dente garlic Parmesan pasta. This quick and flavorful recipe is a perfect choice for a delightful and satisfying dinner."></textarea>
+            </div>
+        </div>
+        <div>
+            <h3>Ingredients:</h3>
+            <p>Please <b>first</b> select your preferred measurement system before adding any ingredients.</p>
+            <label for="preferredSystem">Preferred measurement System</label>
+            <select name="preferredSystem" id="preferredSystem" onchange="UpdateHiddenInput()">
+                <option value="metric" selected>Metric</option>
+                <option value="imperial">Imperial</option>
+            </select>
+            <input type="hidden" name="recipe[measurementSystem]" id="measurementSystemHidden">
+
+            <!-- <label for="unitSelect">Unit Select</label>
+            <select name="unitSelect" id="unitSelect"></select> -->
+
+            <div id="ingredientsContainer">
+                <!-- Ingredient input fields will be dynamically added here -->
+            </div>
+            <button type="button" onclick="addIngredient(); disableMeasurementSystem()">Add
+                Ingredient</button>
+        </div>
+        <div>
+            <h3>Method:</h3>
+            <div id="stepsContainer">
+                <!-- Steps input fields will be dynamically added here -->
+            </div>
+            <button type="button" onclick="addStep()">Add Step</button>
+        </div>
+        <div>
+            <button type="submit">Submit Recipe</button>
+        </div>
+    </form>
+
+    <script>
+        UpdateHiddenInput();
+
+        function UpdateHiddenInput() {
+            const selectedSystem = document.getElementById('preferredSystem').value;
+            document.getElementById('measurementSystemHidden').value = selectedSystem
+            console.log(document.getElementById('measurementSystemHidden').value)
+        }
+
+        let ingredientIndex = 0;
+        function addIngredient() {
+            const container = document.getElementById('ingredientsContainer');
+            const ingredientInputs = document.createElement('div');
+            const preferredSystem = document.getElementById('preferredSystem');
+            const metricUnits = [{ value: null, text: '-' },
+            { value: "l", text: "liters" },
+            { value: "g", text: "grams", },
+            { value: "ml", text: "milliliters" },
+            { value: "kg", text: "kilograms" },
+            { value: "tsp", text: "teaspoons" },
+            { value: "Tbs", text: "tablespoons" },
+            { value: "cup", text: "cups" },
+            { value: "mg", text: "milligrams" },
+            ];
+            const imperialUnits = [{ value: null, text: '-' },
+            { value: "gal", text: "gallons" },
+            { value: "oz", text: "ounces" },
+            { value: "tsp", text: "teaspoons" },
+            { value: "Tbs", text: "tablespoons" },
+            { value: "cup", text: "cups" },
+            { value: "qt", text: "quarts" },
+            { value: "fl-oz", text: "fluid ounces" },
+            { value: "lb", text: "pounds" },
+            ];
+
+            function generateUnitOptions(units) {
+                return units.map(unit => `<option value="${unit.value}">${unit.text}</option>`).join('');
+            }
+
+            ingredientInputs.innerHTML = `
+                <label>Amount (optional):</label>
+                <input type="number" name="recipe[ingredients][${ingredientIndex}][amount]">
+                <label>Measurement Unit (optional):</label>
+                <select name="recipe[ingredients][${ingredientIndex}][measurementShorthand]">
+                    ${preferredSystem.value === 'metric' ? metricUnits.map(unit => `<option value="${unit.value}">${unit.text}</option>`) : imperialUnits.map(unit => `<option value="${unit.value}" data-system="${unit.system}">${unit.text}</option>`)}
+                </select>
+                <label>Ingredient Name:</label>
+                <input type="text" name="recipe[ingredients][${ingredientIndex}][ingredientName]" required>
+                <button type="button" onclick="deleteIngredient(this); resetMeasurementSystem()">Delete</button>
+            `;
+            container.appendChild(ingredientInputs);
+            ingredientIndex++;
+            disableMeasurementSystem();
+        }
+
+        function disableMeasurementSystem() {
+            const ingredientsContainer = document.getElementById('ingredientsContainer');
+            const preferredSystem = document.getElementById('preferredSystem');
+            if (ingredientsContainer.children.length > 0) {
+                preferredSystem.disabled = true;
+            }
+        }
+
+        function resetMeasurementSystem() {
+            const ingredientsContainer = document.getElementById('ingredientsContainer');
+            const measureSystemSelect = document.getElementById('preferredSystem');
+            if (ingredientsContainer.children.length === 0) {
+                measureSystemSelect.disabled = false;
+            }
+        }
+
+        function deleteIngredient(button) {
+            button.parentNode.remove();
+        }
+
+        let stepIndex = 0;
+        function addStep() {
+            const container = document.getElementById('stepsContainer');
+            const stepInput = document.createElement('div');
+            stepInput.innerHTML = `
+                <label>Step ${stepIndex + 1}:</label>
+                <textarea name="recipe[method][${stepIndex}]" rows="1" cols="50" required></textarea>
+                <button type="button" onclick="deleteStep(this)">Delete</button>
+            `;
+            container.appendChild(stepInput);
+            stepIndex++;
+        }
+
+        function deleteStep(button) {
+            const container = document.getElementById('stepsContainer');
+            const steps = Array.from(container.children);
+            const deletedIndex = steps.indexOf(button.parentNode);
+            button.parentNode.remove();
+            updateStepNumbers(deletedIndex);
+        }
+
+        function updateStepNumbers(deletedIndex) {
+            const container = document.getElementById('stepsContainer');
+            const steps = Array.from(container.children);
+            steps.forEach((step, index) => {
+                const label = step.querySelector('label');
+                const textarea = step.querySelector('textarea');
+                label.textContent = `Step ${index + 1}:`;
+                textarea.name = `recipe[method][${index}]`;
+            });
+            if (deletedIndex !== undefined) {
+                stepIndex = steps.length;
+            }
+        }
+
+    </script>
+</body>
+
+</html>

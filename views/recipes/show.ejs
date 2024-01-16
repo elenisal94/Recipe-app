@@ -8,8 +8,49 @@
 </head>
 
 <body>
-    <h1><%= recipe.title %></h1>
-    <h2><%= recipe.location %></h2>
+
+    <h1>
+        <%= recipe.title %>
+    </h1>
+    <p>
+        <%= recipe.description %>
+    </p>
+    <h3>
+        Origin country: <%= `${recipe.countryFullname} ${recipe.countryFlag}` %>
+    </h3>
+    <h3>Preparation time: <%= `${recipe.prepHours ? recipe.prepHours + (recipe.prepHours==="1" ? " hour" : " hours" )
+            : "" } ${recipe.prepMinutes ? recipe.prepMinutes + " minutes" : "" }` %>
+    </h3>
+    <h3>Serves: <%= recipe.serves %>
+    </h3>
+    <h3>Ingredients</h3>
+    <ul>
+        <%if(recipe.measurementSystem==='metric' ){recipe.ingredients.forEach(function(ingredient) { %>
+            <li>
+                <%= `${ingredient.amount !==null ? ingredient.amount.toFixed(0):''} ${ingredient.measurementShorthand
+                    !=='null' ? (ingredient.measurementShorthand==='cup' && ingredient.amount> 1 ? 'cups' :
+                    (ingredient.measurementShorthand === 'Tbs' ? 'tbsp' : ingredient.measurementShorthand))
+                    : ''} ${ingredient.ingredientName}` %>
+            </li>
+            <% });} else{convertedIngredients.forEach(function(ingredient){%>
+                <li>
+                    <%= `${ingredient.amount !==null ? ingredient.amount.toFixed(0):''}
+                        ${ingredient.measurementShorthand !=='null' ? (ingredient.measurementShorthand==='cup' &&
+                        ingredient.amount> 1 ? 'cups' :
+                        (ingredient.measurementShorthand === 'Tbs' ? 'tbsp' : ingredient.measurementShorthand))
+                        : ''}
+                        ${ingredient.ingredientName}` %>
+                </li>
+                <% })} %>
+    </ul>
+    <h3>Method</h3>
+    <ol>
+        <% recipe.method.forEach(function(method) { %>
+            <li>
+                <%= `${method}` %>
+            </li>
+            <% }); %>
+    </ol>
     <p> <a href="/recipes/<%=recipe._id%>/edit">Edit</a>
     </p>
     <p>
