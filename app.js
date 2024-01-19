@@ -141,6 +141,11 @@ app.put('/recipes/:id', async (req, res) => {
     }
 });
 
+app.delete('/recipes/:id', async (req, res) => {
+    const { id } = req.params;
+    await Recipe.findByIdAndDelete(id);
+    res.redirect('/recipes');
+})
 
 app.listen(3000, () => {
     console.log('Serving on port 3000')

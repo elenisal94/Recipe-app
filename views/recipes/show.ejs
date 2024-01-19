@@ -52,12 +52,14 @@
             <% }); %>
     </ol>
     <p>
+        <a href="/recipes/<%=recipe._id%>/edit">Edit</a>
+    </p>
+    <p>
     <form action="/recipes/<%=recipe._id%>?_method=DELETE" method="POST">
         <button>Delete</button>
     </form>
     </p>
     <footer>
-        <a href="/recipes/<%=recipe._id%>/edit">Edit</a>
         <a href="/recipes">All Recipes</a>
     </footer>
 
