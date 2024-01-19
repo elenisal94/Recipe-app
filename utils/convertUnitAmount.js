@@ -20,6 +20,7 @@ const metricToImperialConversion = {
     cup: { target: 'cup' },
     ml: { target: 'fl-oz' },
     kg: { target: 'lb' },
+    mg: { target: 'oz' },
 };
 
 
@@ -27,19 +28,31 @@ function convertToMetric(unitAmount, unitSelect, measurementSystem) {
     if (measurementSystem !== 'imperial' || unitSelect === null) {
         return { convertedAmount: unitAmount, targetUnit: unitSelect };
     }
-    console.log(unitAmount, unitSelect);
+    if (unitSelect === 'null') {
+        return { convertedAmount: unitAmount, targetUnit: null }
+    }
+    if (unitAmount === null) {
+        console.warn(`Conversion not available for null amount with unit ${unitSelect}`);
+        return { convertedAmount: null, targetUnit: unitSelect };
+    }
     if (imperialToMetricConversion.hasOwnProperty(unitSelect)) {
         const targetUnit = imperialToMetricConversion[unitSelect].target;
         const convertedAmount = convert(unitAmount).from(unitSelect).to(targetUnit);
         return { convertedAmount, targetUnit };
     } else {
-        console.warn(`Conversion not available for ${unitSelect}`);
+        console.warn(`Convert to Metric: Conversion not available for ${unitSelect}`);
         return { convertedAmount: unitAmount, targetUnit: unitSelect };
     }
 }
 
 
 function convertToImperial(unitAmount, unitSelect, measurementSystem) {
+    if (unitSelect === null) {
+        return { convertedAmount: unitAmount, targetUnit: null };
+    }
+    if (unitSelect === 'null') {
+        return { convertedAmount: unitAmount, targetUnit: null }
+    }
     if (unitSelect === 'l') {
         const gallons = convert(unitAmount).from(unitSelect).to('gal');
         const quarts = convert(unitAmount).from(unitSelect).to('qt');
@@ -52,7 +65,7 @@ function convertToImperial(unitAmount, unitSelect, measurementSystem) {
         const convertedAmount = convert(unitAmount).from(unitSelect).to(targetUnit);
         return { convertedAmount, targetUnit };
     } else {
-        console.warn(`Conversion not available for ${unitSelect}`);
+        console.warn(`Convert to Imperial: Conversion not available for ${unitSelect}`);
         return { convertedAmount: unitAmount, targetUnit: unitSelect };
     }
 };

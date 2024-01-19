@@ -7,15 +7,31 @@ const RecipeSchema = new Schema({
     prepMinutes: Number,
     serves: Number,
     description: String,
-    country: String,
+    countryCode: String,
     countryFullname: String,
     countryFlag: String,
     measurementSystem: String,
     ingredients: [
         {
-            amount: Number,
-            measurementUnit: String,
-            measurementShorthand: String,
+            amount: {
+                type: Number,
+                // default: null,
+                set: function (value) {
+                    return value === 'null' || value === undefined ? null : value;
+                }
+            },
+            measurementUnit: {
+                type: String,
+                set: function (value) {
+                    return value === 'null' ? null : value;
+                }
+            },
+            measurementShorthand: {
+                type: String,
+                set: function (value) {
+                    return value === 'null' ? null : value;
+                }
+            },
             ingredientName: String,
         }
     ],

@@ -1,7 +1,7 @@
 const convert = require('convert-units');
 
 const metricShorthandData = {
-    "null": { measurementShorthand: "null" },
+    null: { measurementShorthand: null },
     "liters": { measurementShorthand: "l" },
     "grams": { measurementShorthand: "g" },
     "milliliters": { measurementShorthand: "ml" },
@@ -12,7 +12,7 @@ const metricShorthandData = {
     "milligrams": { measurementShorthand: "mg" },
 };
 const imperialShorthandData = {
-    "null": { measurementShorthand: "null" },
+    null: { measurementShorthand: null },
     "gallons": { measurementShorthand: "gal" },
     "ounces": { measurementShorthand: "oz" },
     "teaspoons": { measurementShorthand: "tsp" },

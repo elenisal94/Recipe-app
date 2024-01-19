@@ -27,15 +27,15 @@
     <ul>
         <%if(recipe.measurementSystem==='metric' ){recipe.ingredients.forEach(function(ingredient) { %>
             <li>
-                <%= `${ingredient.amount !==null ? ingredient.amount.toFixed(0):''} ${ingredient.measurementShorthand
-                    !=='null' ? (ingredient.measurementShorthand==='cup' && ingredient.amount> 1 ? 'cups' :
+                <%= `${ingredient.amount !==null ? roundValue(ingredient.amount):''} ${ingredient.measurementShorthand
+                    !==null ? (ingredient.measurementShorthand==='cup' && ingredient.amount> 1 ? 'cups' :
                     (ingredient.measurementShorthand === 'Tbs' ? 'tbsp' : ingredient.measurementShorthand))
                     : ''} ${ingredient.ingredientName}` %>
             </li>
             <% });} else{convertedIngredients.forEach(function(ingredient){%>
                 <li>
-                    <%= `${ingredient.amount !==null ? ingredient.amount.toFixed(0):''}
-                        ${ingredient.measurementShorthand !=='null' ? (ingredient.measurementShorthand==='cup' &&
+                    <%= `${ingredient.amount !==null ? roundValue(ingredient.amount) :''}
+                        ${ingredient.measurementShorthand !==null ? (ingredient.measurementShorthand==='cup' &&
                         ingredient.amount> 1 ? 'cups' :
                         (ingredient.measurementShorthand === 'Tbs' ? 'tbsp' : ingredient.measurementShorthand))
                         : ''}
@@ -51,16 +51,16 @@
             </li>
             <% }); %>
     </ol>
-    <p> <a href="/recipes/<%=recipe._id%>/edit">Edit</a>
-    </p>
     <p>
     <form action="/recipes/<%=recipe._id%>?_method=DELETE" method="POST">
         <button>Delete</button>
     </form>
     </p>
     <footer>
+        <a href="/recipes/<%=recipe._id%>/edit">Edit</a>
         <a href="/recipes">All Recipes</a>
     </footer>
+
 </body>
 
 </html>

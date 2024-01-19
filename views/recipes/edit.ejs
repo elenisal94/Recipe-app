@@ -4,21 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Recipe</title>
+    <title>Edit Recipe</title>
 </head>
 
 <body>
 
-    <form id="recipeForm" action="/recipes" method="POST">
+    <form id="recipeForm" action="/recipes/<%=recipe._id%>?_method=PUT" method="POST">
 
-        <h1>Add a new recipe!</h1>
-        <label for="title">Recipe name:</label>
-        <input type="text" id="title" name="recipe[title]" placeholder="e.g. Divine turkey steak" required>
+        <h1>Edit Recipe</h1>
+        <div>
+            <label for="title">Recipe name:</label>
+            <input type="text" id="title" name="recipe[title]" placeholder="e.g. Divine turkey steak"
+                value="<%=recipe.title%>" required>
+        </div>
         <div>
             <h3>Description</h3>
             <label for="description">Briefly describe this recipe (4 sentences max.)</label>
             <div><textarea id="description" name="recipe[description]" rows="10" cols="50" maxlength="200" required
-                    placeholder="E.g. Savor the delicious combination of expertly seasoned pan-seared turkey steaks paired with al dente garlic Parmesan pasta. This quick and flavorful recipe is a perfect choice for a delightful and satisfying dinner."></textarea>
+                    placeholder="E.g. Savor the delicious combination of expertly seasoned pan-seared turkey steaks paired with al dente garlic Parmesan pasta. This quick and flavorful recipe is a perfect choice for a delightful and satisfying dinner."><%= recipe.description %></textarea>
             </div>
         </div>
         <div>
@@ -26,7 +29,7 @@
             <label for="country">Recipe origin country:</label>
             <select name="recipe[countryCode]" id="country" required>
                 <% Object.entries(countryInfoData).forEach(([code, country])=> { %>
-                    <option value="<%= code %>" <%=code==='Unknown' ? ' selected' : '' %>>
+                    <option value="<%= code %>" <%=code===recipe.countryCode ? 'selected' : '' %>>
                         <%= country.countryFullname %>
                             <%= country.countryFlag %>
                     </option>
@@ -37,27 +40,20 @@
         <div>
             <h3>Preparation Time</h3>
             <select id="prepHours" name="recipe[prepHours]">
-                <option value="0" selected>-</option>
+                <option value="<%= recipe.prepHours %>"></option>
+                <option value="0" <%=recipe.prepHours===0 ? 'selected' : '' %>>-</option>
                 <% for (let i=1; i <=48; i++) { %>
-                    <option value="<%= i %>">
-                        <%= i %>
+                    <option value="<%= i %>" <%=recipe.prepHours===i ? 'selected' : '' %>><%= i %>
                     </option>
                     <% } %>
             </select>
+
             <label for="prepHours">hours</label>
             <select id="prepMinutes" name="recipe[prepMinutes]" placeholder="minutes">
-                <option value="0" selected>-</option>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="20">20</option>
-                <option value="25">25</option>
-                <option value="30">30</option>
-                <option value="35">35</option>
-                <option value="40">40</option>
-                <option value="45">45</option>
-                <option value="50">50</option>
-                <option value="55">55</option>
+                <% for (let i=0; i <=55; i +=5) { %>
+                    <option value="<%= i %>" <%=recipe.prepMinutes===i ? 'selected' : '' %>><%= i===0 ? '-' : i %>
+                    </option>
+                    <% } %>
             </select>
             <label for="prepMinutes">minutes</label>
         </div>
@@ -66,22 +62,20 @@
             <h3>Servings</h3>
             <label for="serves">Serves</label>
             <select id="serves" name="recipe[serves]" required>
-                <option value="0" selected>-</option>
-                <% for (let i=1; i <=15; i++) { %>
-                    <option value="<%= i %>">
-                        <%= i %>
+                <% for (let i=0; i <=15; i++) { %>
+                    <option value="<%= i %>" <%=recipe.serves===i ? 'selected' : '' %>>
+                        <%= i===0 ? '-' : i %>
                     </option>
                     <% } %>
             </select>
         </div>
-
         <div>
             <h3>Ingredients:</h3>
             <p>Please <b>first</b> select your preferred measurement system before adding any ingredients.</p>
             <label for="preferredSystem">Preferred measurement System</label>
             <select name="preferredSystem" id="preferredSystem" onchange="UpdateHiddenInput()">
-                <option value="metric" selected>Metric</option>
-                <option value="imperial">Imperial</option>
+                <option value="metric" <%=recipe.measurementSystem==='metric' ? 'selected' : '' %>>Metric</option>
+                <option value="imperial" <%=recipe.measurementSystem==='imperial' ? 'selected' : '' %>>Imperial</option>
             </select>
             <input type="hidden" name="recipe[measurementSystem]" id="measurementSystemHidden">
 
@@ -91,7 +85,12 @@
             <div id="ingredientsContainer">
                 <!-- Ingredient input fields will be dynamically added here -->
             </div>
-            <button type="button" onclick="addIngredient();">Add
+            <div id="metricIngredients" data-metric-recipe-ingredients="<%= JSON.stringify(recipe.ingredients) %>">
+            </div>
+            <div id="imperialIngredients"
+                data-imperial-recipe-ingredients="<%= JSON.stringify(convertedIngredients) %>"></div>
+
+            <button type="button" onclick="addIngredient()">Add
                 Ingredient</button>
         </div>
         <div>
@@ -99,12 +98,15 @@
             <div id="stepsContainer">
                 <!-- Steps input fields will be dynamically added here -->
             </div>
+            <div id="recipeMethod" data-recipe-method="<%= JSON.stringify(recipe.method) %>"></div>
+
             <button type="button" onclick="addStep()">Add Step</button>
         </div>
         <div>
-            <button type="submit">Add Recipe</button>
+            <button type="submit">Update Recipe</button>
         </div>
     </form>
+    <a href="/recipes/<%= recipe._id %>">Back to Recipe</a>
 
     <script>
         UpdateHiddenInput();
@@ -115,11 +117,31 @@
             console.log(document.getElementById('measurementSystemHidden').value)
         }
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const preferredSystem = document.getElementById('preferredSystem').value;
+
+            if (preferredSystem === 'metric') {
+                const metricIngredientsData = document.getElementById('metricIngredients').dataset.metricRecipeIngredients;
+                const metricIngredients = JSON.parse(metricIngredientsData);
+                metricIngredients.forEach(ingredientData => {
+                    addIngredient(ingredientData);
+                });
+            } else {
+                const imperialIngredientsData = document.getElementById('imperialIngredients').dataset.imperialRecipeIngredients;
+                const imperialIngredients = JSON.parse(imperialIngredientsData);
+                imperialIngredients.forEach(ingredientData => {
+                    addIngredient(ingredientData);
+                    console.log('imperial ingredientData:', ingredientData)
+                });
+            }
+        });
+
         let ingredientIndex = 0;
-        function addIngredient() {
+        function addIngredient(ingredientData = {}) {
             const container = document.getElementById('ingredientsContainer');
             const ingredientInputs = document.createElement('div');
             const preferredSystem = document.getElementById('preferredSystem');
+            console.log('Imperial shorthand inside add ingredient:', ingredientData.measurementShorthand);
             const metricUnits = [{ value: null, text: '-' },
             { value: "l", text: "liters" },
             { value: "g", text: "grams", },
@@ -143,13 +165,14 @@
 
             ingredientInputs.innerHTML = `
                 <label>Amount (optional):</label>
-                <input type="number" name="recipe[ingredients][${ingredientIndex}][amount]" placeholder="-">
+                <input type="number" placeholder="-" name="recipe[ingredients][${ingredientIndex}][amount]" value="${ingredientData.amount || ''}">
                 <label>Measurement Unit (optional):</label>
                 <select name="recipe[ingredients][${ingredientIndex}][measurementShorthand]">
-                    ${preferredSystem.value === 'metric' ? metricUnits.map(unit => `<option value="${unit.value}">${unit.text}</option>`) : imperialUnits.map(unit => `<option value="${unit.value}" data-system="${unit.system}">${unit.text}</option>`)}
+                    ${preferredSystem.value === 'metric' ? metricUnits.map(unit => `<option value="${unit.value}" ${unit.value === ingredientData.measurementShorthand ? 'selected' : ''}>${unit.text}</option>`) :
+                    imperialUnits.map(unit => `<option value="${unit.value}" ${unit.value === ingredientData.measurementShorthand ? 'selected' : ''}>${unit.text}</option>`)}
                 </select>
                 <label>Ingredient Name:</label>
-                <input type="text" name="recipe[ingredients][${ingredientIndex}][ingredientName]" required>
+                <input type="text" name="recipe[ingredients][${ingredientIndex}][ingredientName]" value="${ingredientData.ingredientName || ''}" required>
                 <button type="button" onclick="deleteIngredient(this); resetMeasurementSystem()">Delete</button>
             `;
             container.appendChild(ingredientInputs);
@@ -177,13 +200,28 @@
             button.parentNode.remove();
         }
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('stepsContainer');
+            if (container) {
+                const recipeMethodElement = document.getElementById('recipeMethod');
+                if (recipeMethodElement) {
+                    const recipeMethodString = recipeMethodElement.getAttribute('data-recipe-method');
+                    const recipeMethod = JSON.parse(recipeMethodString);
+
+                    recipeMethod.forEach(step => {
+                        addStep(step);
+                    });
+                }
+            }
+        });
+
         let stepIndex = 0;
-        function addStep() {
+        function addStep(stepText = '') {
             const container = document.getElementById('stepsContainer');
             const stepInput = document.createElement('div');
             stepInput.innerHTML = `
                 <label>Step ${stepIndex + 1}:</label>
-                <textarea name="recipe[method][${stepIndex}]" rows="1" cols="50" required></textarea>
+                <textarea name="recipe[method][${stepIndex}]" rows="1" cols="50" required>${stepText}</textarea>
                 <button type="button" onclick="deleteStep(this)">Delete</button>
             `;
             container.appendChild(stepInput);

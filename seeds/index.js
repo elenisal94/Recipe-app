@@ -21,7 +21,7 @@ const sample = array => array[Math.floor(Math.random() * array.length)];
 const getRandomCountry = () => {
     const countryCodes = Object.keys(countryInfoData);
     const randomCountryCode = sample(countryCodes);
-    return countryInfoData[randomCountryCode];
+    return { randomCountryCode, ...countryInfoData[randomCountryCode] };
 };
 
 const seedDB = async () => {
@@ -31,7 +31,7 @@ const seedDB = async () => {
         const randomMin = Math.floor(Math.random() * 11) * 5;
         const prepHours = randomHour;
         const prepMinutes = randomMin;
-        const countryInfo = getRandomCountry();
+        const { randomCountryCode, ...countryInfo } = getRandomCountry();
 
         const ingredients = Array.from({ length: 8 }, () => {
             const randomNumber = Math.floor(Math.random() * 6) + 1;
@@ -68,6 +68,7 @@ const seedDB = async () => {
             prepMinutes,
             serves: `${Math.floor(Math.random() * 6) + 1}`,
             description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Cursus sit amet dictum sit amet justo donec. Amet nisl suscipit adipiscing bibendum est.`,
+            countryCode: randomCountryCode,
             countryFullname: countryInfo.countryFullname,
             countryFlag: countryInfo.countryFlag,
             measurementSystem: 'metric',
