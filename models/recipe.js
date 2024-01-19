@@ -3,10 +3,11 @@ const Schema = mongoose.Schema;
 
 const RecipeSchema = new Schema({
     title: String,
+    image: String,
+    description: String,
     prepHours: Number,
     prepMinutes: Number,
     serves: Number,
-    description: String,
     countryCode: String,
     countryFullname: String,
     countryFlag: String,
