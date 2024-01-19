@@ -3,10 +3,27 @@
     <div>
         <a href="/recipes/new">Add Recipe</a>
     </div>
-    <ul>
-        <% for (let recipe of recipes){%>
-            <li><a href="/recipes/<%= recipe._id %>">
-                    <%= recipe.title %>
-                </a></li>
-            <% }%>
-    </ul>
+    <% for (let recipe of recipes){%>
+        <div class="card" mb-3>
+            <div class="row">
+                <div class="col-md-4">
+                    <img class="img-fluid" alt="" src="<%=recipe.image%>">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <%= recipe.title %>
+                        </h5>
+                        <p class="card-text">
+                            <%=recipe.description %>
+                        </p>
+                        <p class="card-text"><small class="text-muted">
+                                <%= recipe.countryFullname %>
+                            </small></p>
+                        <a class="btn btn-primary" href="/recipes/<%=recipe._id%>">View <%=recipe.title%></a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <% }%>
