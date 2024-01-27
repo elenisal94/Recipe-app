@@ -1,103 +1,129 @@
 <% layout('layouts/boilerplate')%>
 
-    <form id="recipeForm" action="/recipes/<%=recipe._id%>?_method=PUT" method="POST">
+    <div class="row">
+        <h1 class="text-center">Edit Recipe</h1>
+        <div class="col-10 offset-1">
+            <form id="recipeForm" action="/recipes/<%=recipe._id%>?_method=PUT" method="POST">
+                <div class="mb-3">
+                    <h3>General Info</h3>
+                    <label class="form-label" for="title">Recipe name:</label>
+                    <div class="col-12 col-sm-10 col-md-5 col-xl-4">
+                        <input class="form-control" type="text" id="title" name="recipe[title]"
+                            placeholder="e.g. Divine turkey steak" value="<%=recipe.title%>" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="description">Briefly describe this recipe (4 sentences max.):</label>
+                    <div><textarea class="form-control" id="description" name="recipe[description]" rows="5" cols="50"
+                            maxlength="200" required
+                            placeholder="e.g. Savor the delicious combination of expertly seasoned pan-seared turkey steaks paired with al dente garlic Parmesan pasta. This quick and flavorful recipe is a perfect choice for a delightful and satisfying dinner."><%= recipe.description %></textarea>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="country">Recipe origin country:</label>
+                    <select class="form-select" name="recipe[countryCode]" id="country" required>
+                        <% Object.entries(countryInfoData).forEach(([code, country])=> { %>
+                            <option value="<%= code %>" <%=code===recipe.countryCode ? ' selected' : '' %>>
+                                <%= country.countryFullname %>
+                                    <%= country.countryFlag %>
+                            </option>
+                            <% }); %>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="image">Recipe image URL:</label>
+                    <input class="form-control" type="url" id="image" name="recipe[image]" value="<%=recipe.image%>"
+                        required>
+                </div>
 
-        <h1>Edit Recipe</h1>
-        <div>
-            <label for="title">Recipe name:</label>
-            <input type="text" id="title" name="recipe[title]" placeholder="e.g. Divine turkey steak"
-                value="<%=recipe.title%>" required>
-        </div>
-        <div>
-            <h3>Description</h3>
-            <label for="description">Briefly describe this recipe (4 sentences max.)</label>
-            <div><textarea id="description" name="recipe[description]" rows="10" cols="50" maxlength="200" required
-                    placeholder="E.g. Savor the delicious combination of expertly seasoned pan-seared turkey steaks paired with al dente garlic Parmesan pasta. This quick and flavorful recipe is a perfect choice for a delightful and satisfying dinner."><%= recipe.description %></textarea>
-            </div>
-        </div>
-        <div>
-            <h3>Origin country</h3>
-            <label for="country">Recipe origin country:</label>
-            <select name="recipe[countryCode]" id="country" required>
-                <% Object.entries(countryInfoData).forEach(([code, country])=> { %>
-                    <option value="<%= code %>" <%=code===recipe.countryCode ? 'selected' : '' %>>
-                        <%= country.countryFullname %>
-                            <%= country.countryFlag %>
-                    </option>
-                    <% }); %>
-            </select>
-        </div>
+                <div class="mb-3">
+                    <p>Preparation time:</p>
+                    <div class="row g-1">
+                        <div class="col-3 col-sm-3 col-lg-2 col-xl-1">
+                            <select class="form-select text-center" id="prepHours" name="recipe[prepHours]">
+                                <option value="<%= recipe.prepHours %>"></option>
+                                <option value="0" <%=recipe.prepHours===0 ? 'selected' : '' %>>-</option>
+                                <% for (let i=1; i <=48; i++) { %>
+                                    <option value="<%= i %>" <%=recipe.prepHours===i ? 'selected' : '' %>><%= i %>
+                                    </option>
+                                    <% } %>
+                            </select>
+                        </div>
+                        <div class="col-2 col-sm-2 col-lg-1 text-start mt-3 ml-0 pl-0">
+                            <label class="form-label" for="prepHours">hours</label>
+                        </div>
+                        <div class="col-3 col-sm-3 col-lg-2 col-xl-1">
+                            <select class="form-select text-center" id="prepMinutes" name="recipe[prepMinutes]"
+                                placeholder="minutes">
+                                <% for (let i=0; i <=55; i +=5) { %>
+                                    <option value="<%= i %>" <%=recipe.prepMinutes===i ? 'selected' : '' %>><%= i===0
+                                            ? '-' : i %>
+                                    </option>
+                                    <% } %>
+                            </select>
+                        </div>
+                        <div class="col-3 col-sm-2 col-lg-1 text-start mt-3 ml-0 pl-0">
+                            <label class="form-label" for="prepMinutes">minutes</label>
+                        </div>
+                    </div>
+                </div>
 
-        <div>
-            <h3>Preparation Time</h3>
-            <select id="prepHours" name="recipe[prepHours]">
-                <option value="<%= recipe.prepHours %>"></option>
-                <option value="0" <%=recipe.prepHours===0 ? 'selected' : '' %>>-</option>
-                <% for (let i=1; i <=48; i++) { %>
-                    <option value="<%= i %>" <%=recipe.prepHours===i ? 'selected' : '' %>><%= i %>
-                    </option>
-                    <% } %>
-            </select>
+                <div class="mb-3">
+                    <label class="form-label" for="serves">Serves:</label>
+                    <div class="col-3 col-lg-2 col-xl-1">
+                        <select class="form-select text-center" id="serves" name="recipe[serves]" required>
+                            <option value="0" selected>-</option>
+                            <% for (let i=0; i <=15; i++) { %>
+                                <option value="<%= i %>" <%=recipe.serves===i ? 'selected' : '' %>>
+                                    <%= i===0 ? '-' : i %>
+                                </option>
+                                <% } %>
+                        </select>
+                    </div>
+                </div>
 
-            <label for="prepHours">hours</label>
-            <select id="prepMinutes" name="recipe[prepMinutes]" placeholder="minutes">
-                <% for (let i=0; i <=55; i +=5) { %>
-                    <option value="<%= i %>" <%=recipe.prepMinutes===i ? 'selected' : '' %>><%= i===0 ? '-' : i %>
-                    </option>
-                    <% } %>
-            </select>
-            <label for="prepMinutes">minutes</label>
+                <div class="mb-4">
+                    <h3>Ingredients</h3>
+                    <label class="form-label" aria-label="Disabled select example" for="preferredSystem">Preferred
+                        measurement system:</label>
+                    <div class="col-9 col-sm-6 col-md-4 col-xl-3">
+                        <select class="form-select" name="preferredSystem" id="preferredSystem"
+                            onchange="UpdateHiddenInput()">
+                            <option value="metric" <%=recipe.measurementSystem==='metric' ? 'selected' : '' %>>Metric
+                            </option>
+                            <option value="imperial" <%=recipe.measurementSystem==='imperial' ? 'selected' : '' %>
+                                >Imperial</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="recipe[measurementSystem]" id="measurementSystemHidden">
+
+                    <div id="ingredientsContainer" class="row mb-3 list-group">
+                        <!-- Ingredient input fields will be dynamically added here -->
+                    </div>
+                    <div id="metricIngredients"
+                        data-metric-recipe-ingredients="<%= JSON.stringify(recipe.ingredients) %>">
+                    </div>
+                    <div id="imperialIngredients"
+                        data-imperial-recipe-ingredients="<%= JSON.stringify(convertedIngredients) %>"></div>
+                    <button type="button" class="btn btn-primary" onclick="addIngredient();">Add
+                        Ingredient</button>
+                </div>
+                <div class="mb-4">
+                    <h3>Method</h3>
+                    <div id="stepsContainer">
+                        <!-- Steps input fields will be dynamically added here -->
+                    </div>
+                    <div id="recipeMethod" data-recipe-method="<%= JSON.stringify(recipe.method) %>"></div>
+                    <button type="button" class="btn btn-primary" onclick="addStep()">Add Step</button>
+                </div>
+                <div class="my-3">
+                    <button class="btn btn-success col-12 col-lg-3 offset-lg-5 mt-3" type="submit">Update
+                        Recipe</button>
+                </div>
+            </form>
+            <a href="/recipes/<%= recipe._id %>">Back to Recipe</a>
         </div>
-
-        <div>
-            <h3>Servings</h3>
-            <label for="serves">Serves</label>
-            <select id="serves" name="recipe[serves]" required>
-                <% for (let i=0; i <=15; i++) { %>
-                    <option value="<%= i %>" <%=recipe.serves===i ? 'selected' : '' %>>
-                        <%= i===0 ? '-' : i %>
-                    </option>
-                    <% } %>
-            </select>
-        </div>
-        <div>
-            <h3>Ingredients:</h3>
-            <p>Please <b>first</b> select your preferred measurement system before adding any ingredients.</p>
-            <label for="preferredSystem">Preferred measurement System</label>
-            <select name="preferredSystem" id="preferredSystem" onchange="UpdateHiddenInput()">
-                <option value="metric" <%=recipe.measurementSystem==='metric' ? 'selected' : '' %>>Metric</option>
-                <option value="imperial" <%=recipe.measurementSystem==='imperial' ? 'selected' : '' %>>Imperial</option>
-            </select>
-            <input type="hidden" name="recipe[measurementSystem]" id="measurementSystemHidden">
-
-            <!-- <label for="unitSelect">Unit Select</label>
-            <select name="unitSelect" id="unitSelect"></select> -->
-
-            <div id="ingredientsContainer">
-                <!-- Ingredient input fields will be dynamically added here -->
-            </div>
-            <div id="metricIngredients" data-metric-recipe-ingredients="<%= JSON.stringify(recipe.ingredients) %>">
-            </div>
-            <div id="imperialIngredients"
-                data-imperial-recipe-ingredients="<%= JSON.stringify(convertedIngredients) %>"></div>
-
-            <button type="button" onclick="addIngredient()">Add
-                Ingredient</button>
-        </div>
-        <div>
-            <h3>Method:</h3>
-            <div id="stepsContainer">
-                <!-- Steps input fields will be dynamically added here -->
-            </div>
-            <div id="recipeMethod" data-recipe-method="<%= JSON.stringify(recipe.method) %>"></div>
-
-            <button type="button" onclick="addStep()">Add Step</button>
-        </div>
-        <div>
-            <button type="submit">Update Recipe</button>
-        </div>
-    </form>
-    <a href="/recipes/<%= recipe._id %>">Back to Recipe</a>
+    </div>
 
     <script>
         UpdateHiddenInput();
@@ -155,16 +181,34 @@
             ];
 
             ingredientInputs.innerHTML = `
-                <label>Amount (optional):</label>
-                <input type="number" placeholder="-" name="recipe[ingredients][${ingredientIndex}][amount]" value="${ingredientData.amount || ''}">
-                <label>Measurement Unit (optional):</label>
-                <select name="recipe[ingredients][${ingredientIndex}][measurementShorthand]">
-                    ${preferredSystem.value === 'metric' ? metricUnits.map(unit => `<option value="${unit.value}" ${unit.value === ingredientData.measurementShorthand ? 'selected' : ''}>${unit.text}</option>`) :
+            <div class="list-group-item">
+                <div class="row g-1">
+                    <div class="col-12 col-md-3 col-lg-3 col-xl-2 text-sm-start text-md-end text-lg-end">
+                        <label class="form-label mt-2">Amount (optional):</label>
+                    </div>
+                    <div class="col-12 col-md-2 col-lg-2 col-xl-1">
+                        <input class="form-control" type="number" placeholder="-" name="recipe[ingredients][${ingredientIndex}][amount]" value="${ingredientData.amount || ''}">
+                    </div>
+                    <div class="col-12 col-md-3 col-lg-3 col-xl-2 text-sm-start text-md-end text-lg-end">
+                        <label class="form-label mt-2">Unit (optional):</label>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-4 col-xl-2">
+                        <select class="form-select" name="recipe[ingredients][${ingredientIndex}][measurementShorthand]">
+                        ${preferredSystem.value === 'metric' ? metricUnits.map(unit => `<option value="${unit.value}" ${unit.value === ingredientData.measurementShorthand ? 'selected' : ''}>${unit.text}</option>`) :
                     imperialUnits.map(unit => `<option value="${unit.value}" ${unit.value === ingredientData.measurementShorthand ? 'selected' : ''}>${unit.text}</option>`)}
-                </select>
-                <label>Ingredient Name:</label>
-                <input type="text" name="recipe[ingredients][${ingredientIndex}][ingredientName]" value="${ingredientData.ingredientName || ''}" required>
-                <button type="button" onclick="deleteIngredient(this); resetMeasurementSystem()">Delete</button>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-3 col-lg-3 col-xl-2 text-sm-start text-md-end text-lg-end">
+                        <label class="form-label mt-2">Ingredient name:</label>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-5 col-xl-2">
+                        <input class="form-control" type="text" name="recipe[ingredients][${ingredientIndex}][ingredientName]" value="${ingredientData.ingredientName || ''}" required>
+                    </div>
+                    <div class= "col-12 col-md-2 col-lg-2 col-xl-1 mt-3 mt-md-1">
+                        <button type="button" class="btn btn-danger" style="width: 100%;" onclick="deleteIngredient(this.parentNode.parentNode.parentNode); resetMeasurementSystem()">Delete</button>
+                    </div>
+                </div>
+            </div>
             `;
             container.appendChild(ingredientInputs);
             ingredientIndex++;
@@ -211,9 +255,17 @@
             const container = document.getElementById('stepsContainer');
             const stepInput = document.createElement('div');
             stepInput.innerHTML = `
-                <label>Step ${stepIndex + 1}:</label>
-                <textarea name="recipe[method][${stepIndex}]" rows="1" cols="50" required>${stepText}</textarea>
-                <button type="button" onclick="deleteStep(this)">Delete</button>
+                <div class="row mb-2">
+                    <div class="col-12 col-xl-1">
+                        <label class="form-label mt-2">Step ${stepIndex + 1}:</label>
+                    </div>
+                    <div class="col-12 col-xl-10">
+                        <textarea class="form-control" name="recipe[method][${stepIndex}]" rows="1" cols="50" required>${stepText}</textarea>
+                    </div>
+                    <div class="col-xl-1">
+                        <button type="button" class="btn btn-danger float-end mt-2 mt-xl-0" onclick="deleteStep(this.parentNode.parentNode)">Delete</button>
+                    </div>
+                </div>
             `;
             container.appendChild(stepInput);
             stepIndex++;
