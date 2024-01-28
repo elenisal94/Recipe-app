@@ -1,56 +1,72 @@
 <% layout('layouts/boilerplate')%>
 
-    <h1>
-        <%= recipe.title %>
-    </h1>
-    <p>
-        <%= recipe.description %>
-    </p>
-    <img src="<%=recipe.image%>" alt="">
-    <h3>
-        Origin country: <%= `${recipe.countryFullname} ${recipe.countryFlag}` %>
-    </h3>
-    <h3>Preparation time: <%= `${recipe.prepHours ? recipe.prepHours + (recipe.prepHours==="1" ? " hour" : " hours" )
-            : "" } ${recipe.prepMinutes ? recipe.prepMinutes + " minutes" : "" }` %>
-    </h3>
-    <h3>Serves: <%= recipe.serves %>
-    </h3>
-    <h3>Ingredients</h3>
-    <ul>
-        <%if(recipe.measurementSystem==='metric' ){recipe.ingredients.forEach(function(ingredient) { %>
-            <li>
-                <%= `${ingredient.amount !==null ? roundValue(ingredient.amount):''} ${ingredient.measurementShorthand
-                    !==null ? (ingredient.measurementShorthand==='cup' && ingredient.amount> 1 ? 'cups' :
-                    (ingredient.measurementShorthand === 'Tbs' ? 'tbsp' : ingredient.measurementShorthand))
-                    : ''} ${ingredient.ingredientName}` %>
-            </li>
-            <% });} else{convertedIngredients.forEach(function(ingredient){%>
-                <li>
-                    <%= `${ingredient.amount !==null ? roundValue(ingredient.amount) :''}
-                        ${ingredient.measurementShorthand !==null ? (ingredient.measurementShorthand==='cup' &&
-                        ingredient.amount> 1 ? 'cups' :
-                        (ingredient.measurementShorthand === 'Tbs' ? 'tbsp' : ingredient.measurementShorthand))
-                        : ''}
-                        ${ingredient.ingredientName}` %>
-                </li>
-                <% })} %>
-    </ul>
-    <h3>Method</h3>
-    <ol>
-        <% recipe.method.forEach(function(method) { %>
-            <li>
-                <%= `${method}` %>
-            </li>
-            <% }); %>
-    </ol>
-    <p>
-        <a href="/recipes/<%=recipe._id%>/edit">Edit</a>
-    </p>
-    <p>
-    <form action="/recipes/<%=recipe._id%>?_method=DELETE" method="POST">
-        <button>Delete</button>
-    </form>
-    </p>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <img src="<%=recipe.image%>" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <%= recipe.title %>
+                    </h5>
+                    <p class="card-text">
+                        <%= recipe.description %>
+                    </p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item text-muted">
+                        <%= `${recipe.countryFullname} ${recipe.countryFlag}` %>
+                    </li>
+                    <li class="list-group-item">
+                        <%= `${recipe.prepHours ? recipe.prepHours + (recipe.prepHours===1 ? " hour" : " hours" ) : "" }
+                            ${recipe.prepMinutes ? recipe.prepMinutes + " minutes" : "" }` %>
+                    </li>
+                    <li class="list-group-item">For <%= recipe.serves %> people</li>
+                    <li class="list-group-item"> Ingredients:
+                        <ul>
+                            <%if(recipe.measurementSystem==='metric' ){recipe.ingredients.forEach(function(ingredient) {
+                                %>
+                                <li>
+                                    <%= `${ingredient.amount !==null ? roundValue(ingredient.amount):''}
+                                        ${ingredient.measurementShorthand !==null ?
+                                        (ingredient.measurementShorthand==='cup' && ingredient.amount> 1 ? 'cups' :
+                                        (ingredient.measurementShorthand === 'Tbs' ? 'tbsp' :
+                                        ingredient.measurementShorthand))
+                                        : ''} ${ingredient.ingredientName}` %>
+                                </li>
+                                <% });} else{convertedIngredients.forEach(function(ingredient){%>
+                                    <li>
+                                        <%= `${ingredient.amount !==null ? roundValue(ingredient.amount) :''}
+                                            ${ingredient.measurementShorthand !==null ?
+                                            (ingredient.measurementShorthand==='cup' && ingredient.amount> 1 ? 'cups' :
+                                            (ingredient.measurementShorthand === 'Tbs' ? 'tbsp' :
+                                            ingredient.measurementShorthand))
+                                            : ''}
+                                            ${ingredient.ingredientName}` %>
+                                    </li>
+                                    <% })} %>
+                        </ul>
+                    </li>
+                    <li class="list-group-item">
+                        Method:
+                        <ol>
+                            <% recipe.method.forEach(function(method) { %>
+                                <li>
+                                    <%= `${method}` %>
+                                </li>
+                                <% }); %>
+                        </ol>
+                    </li>
+                </ul>
+                <div class="card-body">
+                    <a class="card-link btn btn-warning" href="/recipes/<%=recipe._id%>/edit">Edit</a>
+                    <form class="d-inline" action="/recipes/<%=recipe._id%>?_method=DELETE" method="POST">
+                        <button class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <a href="/recipes">All Recipes</a>
     </footer>
