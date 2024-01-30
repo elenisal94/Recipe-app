@@ -3,13 +3,17 @@
     <div class="row">
         <h1 class="text-center">Edit Recipe</h1>
         <div class="col-10 offset-1">
-            <form id="recipeForm" action="/recipes/<%=recipe._id%>?_method=PUT" method="POST">
+            <form id="recipeForm" action="/recipes/<%=recipe._id%>?_method=PUT" method="POST" novalidate
+                class="validated-form">
                 <div class="mb-3">
                     <h3>General Info</h3>
                     <label class="form-label" for="title">Recipe name:</label>
                     <div class="col-12 col-sm-10 col-md-5 col-xl-4">
                         <input class="form-control" type="text" id="title" name="recipe[title]"
                             placeholder="e.g. Divine turkey steak" value="<%=recipe.title%>" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -17,6 +21,9 @@
                     <div><textarea class="form-control" id="description" name="recipe[description]" rows="5" cols="50"
                             maxlength="200" required
                             placeholder="e.g. Savor the delicious combination of expertly seasoned pan-seared turkey steaks paired with al dente garlic Parmesan pasta. This quick and flavorful recipe is a perfect choice for a delightful and satisfying dinner."><%= recipe.description %></textarea>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -72,7 +79,6 @@
                     <label class="form-label" for="serves">Serves:</label>
                     <div class="col-3 col-lg-2 col-xl-1">
                         <select class="form-select text-center" id="serves" name="recipe[serves]" required>
-                            <option value="0" selected>-</option>
                             <% for (let i=0; i <=15; i++) { %>
                                 <option value="<%= i %>" <%=recipe.serves===i ? 'selected' : '' %>>
                                     <%= i===0 ? '-' : i %>

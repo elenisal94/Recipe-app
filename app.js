@@ -2,6 +2,9 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
+const { recipeSchema } = require('./schemas.js')
+const catchAsync = require('./helper/catchAsync')
+const ExpressError = require('./helper/ExpressError')
 const methodOverride = require('method-override');
 const Recipe = require('./models/recipe');
 const app = express();
@@ -23,8 +26,20 @@ app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
 
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+
+const validateRecipe = (req, res, next) => {
+    console.log('Request Body:', req.body);
+    const { error } = recipeSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
 
 app.use((req, res, next) => {
     res.locals.convert = convert;
@@ -44,7 +59,7 @@ app.get('/recipes/new', (req, res) => {
     res.render('recipes/new', { countryInfoData, metricShorthandData, imperialShorthandData });
 })
 
-app.post('/recipes', async (req, res) => {
+app.post('/recipes', validateRecipe, catchAsync(async (req, res, next) => {
     const recipeData = req.body.recipe;
     const selectedCountryCode = recipeData.countryCode;
     const countryData = getCountryInfo(selectedCountryCode);
@@ -77,10 +92,10 @@ app.post('/recipes', async (req, res) => {
             res.status(500).send('Internal Server Error');
         }
     }
-});
+}));
 
 
-app.get('/recipes/:id', async (req, res) => {
+app.get('/recipes/:id', catchAsync(async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
     function roundValue(value) {
         let roundedValue = value.toFixed(1);
@@ -96,9 +111,9 @@ app.get('/recipes/:id', async (req, res) => {
         };
     }));
     res.render('recipes/show', { recipe, convertedIngredients, roundValue });
-});
+}));
 
-app.get('/recipes/:id/edit', async (req, res) => {
+app.get('/recipes/:id/edit', catchAsync(async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
     const ingredientsArray = recipe.ingredients;
     const convertedIngredients = await Promise.all(ingredientsArray.map(async (ingredient) => {
@@ -110,9 +125,9 @@ app.get('/recipes/:id/edit', async (req, res) => {
         };
     }));
     res.render('recipes/edit', { recipe, countryInfoData, metricShorthandData, imperialShorthandData, convertedIngredients })
-})
+}))
 
-app.put('/recipes/:id', async (req, res) => {
+app.put('/recipes/:id', validateRecipe, catchAsync(async (req, res) => {
     try {
         const { id } = req.params;
         const recipeData = req.body.recipe;
@@ -141,12 +156,22 @@ app.put('/recipes/:id', async (req, res) => {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
-});
+}));
 
-app.delete('/recipes/:id', async (req, res) => {
+app.delete('/recipes/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
     await Recipe.findByIdAndDelete(id);
     res.redirect('/recipes');
+}))
+
+app.all('*', (req, res, next) => {
+    next(new ExpressError('Page not found', 404))
+})
+
+app.use((err, req, res, next) => {
+    const { message = 'something went wrong', statusCode = 500 } = err;
+    if (!err.message) err.message = 'Oh no, something went wrong!'
+    res.status(statusCode).render('error', { err });
 })
 
 app.listen(3000, () => {

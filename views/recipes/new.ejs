@@ -3,13 +3,16 @@
     <div class="row">
         <h1 class="text-center">New Recipe</h1>
         <div class="col-10 offset-1">
-            <form id="recipeForm" action="/recipes" method="POST">
+            <form id="recipeForm" action="/recipes" method="POST" novalidate class="validated-form">
                 <div class="mb-3">
                     <h3>General Info</h3>
                     <label class="form-label" for="title">Recipe name:</label>
                     <div class="col-12 col-sm-10 col-md-5 col-xl-4">
                         <input class="form-control" type="text" id="title" name="recipe[title]"
                             placeholder="e.g. Divine turkey steak" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -17,6 +20,9 @@
                     <div><textarea class="form-control" id="description" name="recipe[description]" rows="5" cols="50"
                             maxlength="200" required
                             placeholder="e.g. Savor the delicious combination of expertly seasoned pan-seared turkey steaks paired with al dente garlic Parmesan pasta. This quick and flavorful recipe is a perfect choice for a delightful and satisfying dinner."></textarea>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3">
