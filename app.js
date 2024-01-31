@@ -2,17 +2,17 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
-const { recipeSchema } = require('./schemas.js')
+const { recipeSchema, reviewSchema } = require('./schemas.js')
 const catchAsync = require('./helper/catchAsync')
 const ExpressError = require('./helper/ExpressError')
 const methodOverride = require('method-override');
 const Recipe = require('./models/recipe');
+const Review = require('./models/review')
 const app = express();
 const convert = require('convert-units');
 const { getCountryInfo, countryInfoData } = require('./utils/countryInfo')
 const { expandOrShortenUnit, metricShorthandData, imperialShorthandData } = require('./utils/shorthand')
 const { convertToMetric, convertToImperial } = require('./utils/convertUnitAmount');
-const recipe = require('./models/recipe');
 
 mongoose.connect('mongodb://localhost:27017/recipe-app');
 
@@ -31,8 +31,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 
 const validateRecipe = (req, res, next) => {
-    console.log('Request Body:', req.body);
     const { error } = recipeSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
+
+const validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body);
     if (error) {
         const msg = error.details.map(el => el.message).join(',')
         throw new ExpressError(msg, 400)
@@ -96,7 +105,7 @@ app.post('/recipes', validateRecipe, catchAsync(async (req, res, next) => {
 
 
 app.get('/recipes/:id', catchAsync(async (req, res) => {
-    const recipe = await Recipe.findById(req.params.id);
+    const recipe = await Recipe.findById(req.params.id).populate('reviews');
     function roundValue(value) {
         let roundedValue = value.toFixed(1);
         return parseFloat(roundedValue);
@@ -162,6 +171,22 @@ app.delete('/recipes/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
     await Recipe.findByIdAndDelete(id);
     res.redirect('/recipes');
+}))
+
+app.post('/recipes/:id/reviews', validateReview, catchAsync(async (req, res) => {
+    const recipe = await Recipe.findById(req.params.id);
+    const review = new Review(req.body.review);
+    recipe.reviews.push(review);
+    await review.save();
+    await recipe.save();
+    res.redirect(`/recipes/${recipe._id}`);
+}))
+
+app.delete('/recipes/:id/reviews/:reviewId', catchAsync(async (req, res) => {
+    const { id, reviewId } = req.params;
+    await Recipe.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/recipes/${id}`);
 }))
 
 app.all('*', (req, res, next) => {

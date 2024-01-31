@@ -26,3 +26,10 @@ module.exports.recipeSchema = Joi.object({
         return value;
     })
 })
+
+module.exports.reviewSchema = Joi.object({
+    review: Joi.object({
+        rating: Joi.number().required().min(1).max(5),
+        body: Joi.string().required().max(600)
+    }).required()
+})
