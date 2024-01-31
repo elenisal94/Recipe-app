@@ -55,7 +55,7 @@ router.post('/', validateRecipe, catchAsync(async (req, res, next) => {
             const convertedIngredients = await Promise.all(conversionPromises);
             const recipe = new Recipe({ ...recipeData, ingredients: convertedIngredients });
             await recipe.save();
-
+            req.flash('success', 'Successfully created a new recipe!');
             res.redirect(`/recipes/${recipe._id}`);
         } catch (error) {
             console.error(error);
