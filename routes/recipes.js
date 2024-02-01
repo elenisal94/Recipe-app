@@ -67,6 +67,10 @@ router.post('/', validateRecipe, catchAsync(async (req, res, next) => {
 
 router.get('/:id', catchAsync(async (req, res) => {
     const recipe = await Recipe.findById(req.params.id).populate('reviews');
+    if (!recipe) {
+        req.flash('error', 'Cannot find that recipe!')
+        return res.redirect('/recipes');
+    }
     function roundValue(value) {
         let roundedValue = value.toFixed(1);
         return parseFloat(roundedValue);
@@ -85,6 +89,10 @@ router.get('/:id', catchAsync(async (req, res) => {
 
 router.get('/:id/edit', catchAsync(async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
+    if (!recipe) {
+        req.flash('error', 'Cannot find that recipe!')
+        return res.redirect('/recipes');
+    }
     const ingredientsArray = recipe.ingredients;
     const convertedIngredients = await Promise.all(ingredientsArray.map(async (ingredient) => {
         const conversionResult = await convertToImperial(ingredient.amount, ingredient.measurementShorthand, recipe.measurementSystem);
@@ -118,6 +126,7 @@ router.put('/:id', validateRecipe, catchAsync(async (req, res) => {
             });
             const convertedIngredients = await Promise.all(conversionPromises);
             await Recipe.findByIdAndUpdate(id, { ...recipeData, ingredients: convertedIngredients });
+            req.flash('success', 'Successfully updated recipe')
             res.redirect(`/recipes/${id}`);
         } else {
             res.status(400).send('Invalid request format');
@@ -131,6 +140,7 @@ router.put('/:id', validateRecipe, catchAsync(async (req, res) => {
 router.delete('/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
     await Recipe.findByIdAndDelete(id);
+    req.flash('success', 'Successfully deleted recipe')
     res.redirect('/recipes');
 }))
 
