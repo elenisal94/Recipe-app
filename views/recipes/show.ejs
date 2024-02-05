@@ -70,13 +70,16 @@
             <form action="/recipes/<%=recipe._id%>/reviews" method="POST" class="mb-3 validated-form" novalidate>
                 <div class="mb-3">
                     <label class="form-label" for="rating">Rating</label>
-                    <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating">
+                    <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="body">Review</label>
                     <textarea class="form-control" name="review[body]" id="" cols="30" rows="3" required></textarea>
                     <div class="valid-feedback">
                         Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Please tell us what you think of this recipe
                     </div>
                 </div>
                 <button class="btn btn-success">Submit</button>

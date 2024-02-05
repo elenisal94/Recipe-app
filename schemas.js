@@ -4,15 +4,15 @@ module.exports.recipeSchema = Joi.object({
     recipe: Joi.object({
         title: Joi.string().max(150).required(),
         image: Joi.string().required(),
-        description: Joi.string().max(600).required(),
-        prepHours: Joi.number().min(0),
-        prepMinutes: Joi.number().min(0),
+        description: Joi.string().max(1400).required(),
+        prepHours: Joi.number().min(0).allow(null, ''),
+        prepMinutes: Joi.number().min(0).allow(null, ''),
         serves: Joi.number().required().min(1),
         countryCode: Joi.string().required(),
         measurementSystem: Joi.string().required(),
         ingredients: Joi.array().items(
             Joi.object({
-                amount: Joi.number().min(0),
+                amount: Joi.number().min(0).allow(null, ''),
                 measurementUnit: Joi.string(),
                 measurementShorthand: Joi.string(),
                 ingredientName: Joi.string().required(),

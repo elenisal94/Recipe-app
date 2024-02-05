@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const RecipeSchema = new Schema({
     title: { type: String, required: true, maxlength: 150 },
     image: { type: String, required: true },
-    description: { type: String, required: true, maxlength: 600 },
+    description: { type: String, required: true, maxlength: 1400 },
     prepHours: {
         type: Number, min: 0, validate: {
             validator: function () {
@@ -32,9 +32,9 @@ const RecipeSchema = new Schema({
             {
                 amount: {
                     type: Number,
-                    min: 1,
+                    min: 0,
                     set: function (value) {
-                        return value === 'null' || value === undefined ? null : value;
+                        return value === null || value === undefined || value === 0 || value === '' ? null : value;
                     }
                 },
                 measurementUnit: {
@@ -65,6 +65,17 @@ const RecipeSchema = new Schema({
         }
     ]
 });
+
+RecipeSchema.pre('save', function (next) {
+    if (this.prepHours === '' || this.prepHours === 0) {
+        this.prepHours = null;
+    }
+    if (this.prepMinutes === '' || this.prepMinutes === 0) {
+        this.prepMinutes = null;
+    }
+    next();
+});
+
 
 RecipeSchema.post('findOneAndDelete', async function (doc) {
     if (doc) {

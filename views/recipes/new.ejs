@@ -13,15 +13,21 @@
                         <div class="valid-feedback">
                             Looks good!
                         </div>
+                        <div class="invalid-feedback">
+                            Please provide a recipe name
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="description">Briefly describe this recipe (4 sentences max.):</label>
                     <div><textarea class="form-control" id="description" name="recipe[description]" rows="5" cols="50"
-                            maxlength="200" required
+                            maxlength="1300" required
                             placeholder="e.g. Savor the delicious combination of expertly seasoned pan-seared turkey steaks paired with al dente garlic Parmesan pasta. This quick and flavorful recipe is a perfect choice for a delightful and satisfying dinner."></textarea>
                         <div class="valid-feedback">
                             Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please provide a brief description
                         </div>
                     </div>
                 </div>
@@ -35,18 +41,27 @@
                             </option>
                             <% }); %>
                     </select>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="image">Recipe image URL:</label>
                     <input class="form-control" type="url" id="image" name="recipe[image]" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Please provide a valid URL
+                    </div>
                 </div>
 
                 <div class="mb-3">
                     <p>Preparation time:</p>
                     <div class="row g-1">
-                        <div class="col-3 col-sm-3 col-lg-2 col-xl-1">
+                        <div class="col-6 col-sm-3 col-lg-2 col-xl-2">
                             <select class="form-select text-center" id="prepHours" name="recipe[prepHours]">
-                                <option value="0" selected>-</option>
+                                <option value="">-</option>
                                 <% for (let i=1; i <=48; i++) { %>
                                     <option value="<%= i %>">
                                         <%= i %>
@@ -54,50 +69,53 @@
                                     <% } %>
                             </select>
                         </div>
-                        <div class="col-2 col-sm-2 col-lg-1 text-start mt-3 ml-0 pl-0">
+                        <div class="col-4 col-sm-2 col-lg-1 text-start mt-3 ml-0 pl-0">
                             <label class="form-label" for="prepHours">hours</label>
                         </div>
-                        <div class="col-3 col-sm-3 col-lg-2 col-xl-1">
+                        <div class="col-6 col-sm-3 col-lg-2 col-xl-2">
                             <select class="form-select text-center" id="prepMinutes" name="recipe[prepMinutes]"
                                 placeholder="minutes">
-                                <option value="0" selected>-</option>
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="15">15</option>
-                                <option value="20">20</option>
-                                <option value="25">25</option>
-                                <option value="30">30</option>
-                                <option value="35">35</option>
-                                <option value="40">40</option>
-                                <option value="45">45</option>
-                                <option value="50">50</option>
-                                <option value="55">55</option>
+                                <option value="">-</option>
+                                <% for (let i=5; i <=55; i +=5) { %>
+                                    <option value="<%= i %>">
+                                        <%= i %>
+                                    </option>
+                                    <% } %>
                             </select>
                         </div>
-                        <div class="col-3 col-sm-2 col-lg-1 text-start mt-3 ml-0 pl-0">
+                        <div class="col-4 col-sm-2 col-lg-1 text-start mt-3 ml-0 pl-0">
                             <label class="form-label" for="prepMinutes">minutes</label>
                         </div>
+                    </div>
+                    <div id="prepTimeValidation" class="">
+                        <!-- Prep Time Validation messages will be displayed here -->
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label" for="serves">Serves:</label>
-                    <div class="col-3 col-lg-2 col-xl-1">
+                    <label class="form-label" for="serves">Serves (number of people):</label>
+                    <div class="col-5 col-lg-2 col-xl-2">
                         <select class="form-select text-center" id="serves" name="recipe[serves]" required>
-                            <option value="0" selected>-</option>
+                            <option value="" selected>-</option>
                             <% for (let i=1; i <=15; i++) { %>
                                 <option value="<%= i %>">
                                     <%= i %>
                                 </option>
                                 <% } %>
                         </select>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please select a number
+                        </div>
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <h3>Ingredients</h3>
                     <p>Please <b>first</b> select your preferred measurement system before adding any ingredients.</p>
-                    <label class="form-label" aria-label="Disabled select example" for="preferredSystem">Preferred
+                    <label class="form-label" aria-label="Disabled select example" for="preferredSystem">1. Preferred
                         measurement system:</label>
                     <div class="col-9 col-sm-6 col-md-4 col-xl-3">
                         <select class="form-select" name="preferredSystem" id="preferredSystem"
@@ -107,23 +125,36 @@
                         </select>
                     </div>
                     <input type="hidden" name="recipe[measurementSystem]" id="measurementSystemHidden">
-
-                    <div id="ingredientsContainer" class="row mb-3 list-group">
+                    <div class="mt-2">
+                        <p>2. Add recipe ingredients below:</p>
+                        <p class="small text-muted">Valid ingredient format: 0.5 kilograms potatoes, 3 apples, salt.
+                            Please <b>do not</b> use fractions like 2/3 cups of flour.</p>
+                    </div>
+                    <div id="ingredientsContainer" class="row list-group">
                         <!-- Ingredient input fields will be dynamically added here -->
                     </div>
-                    <button type="button" class="btn btn-primary" onclick="addIngredient();">Add
+                    <div id="ingredientsValidation" class="">
+                        <!-- Ingredients Validation messages will be displayed here -->
+                    </div>
+                    <button type="button" class="btn btn-primary mt-2" onclick="addIngredient();">Add
                         Ingredient</button>
                 </div>
                 <div class="mb-4">
                     <h3>Method</h3>
-                    <p>Please add any recipe steps below.</p>
+                    <p>Add recipe steps below:</p>
+                    <p class="small text-muted">Recommended format: Preheat oven at 150°C. Whilst the oven is warming up
+                        chop the onions and potatoes.</p>
                     <div id="stepsContainer">
                         <!-- Steps input fields will be dynamically added here -->
+                    </div>
+                    <div id="methodValidation" class="">
+                        <!-- Method Validation messages will be displayed here -->
                     </div>
                     <button type="button" class="btn btn-primary" onclick="addStep()">Add Step</button>
                 </div>
                 <div class="my-3">
-                    <button class="btn btn-success col-12 col-lg-3 offset-lg-5 mt-3" type="submit">Add Recipe</button>
+                    <button id="submitButton" class="btn btn-success col-12 col-lg-3 offset-lg-5 mt-3" type="submit">Add
+                        Recipe</button>
                 </div>
             </form>
             <a href="/recipes">All Recipes</a>
@@ -170,27 +201,27 @@
             ingredientInputs.innerHTML = `
             <div class="list-group-item">
                 <div class="row g-1">
-                    <div class="col-12 col-md-3 col-lg-3 col-xl-2 text-sm-start text-md-end text-lg-end">
-                            <label class="form-label mt-2">Amount (optional):</label>
+                    <div class="col-12 col-lg-2 col-xl-1 text-sm-start text-lg-end">
+                            <label class="form-label mt-2">Amount:</label>
                     </div>
-                    <div class="col-12 col-md-2 col-lg-2 col-xl-1">
-                        <input class="form-control" name="recipe[ingredients][${ingredientIndex}][amount]" placeholder="-">
+                    <div class="col-12 col-lg-3 col-xl-2">
+                        <input type="number" min="0" class="form-control" step="any" name="recipe[ingredients][${ingredientIndex}][amount]" placeholder="-">
                     </div>
-                    <div class="col-12 col-md-3 col-lg-3 col-xl-2 text-sm-start text-md-end text-lg-end">
-                        <label class="form-label mt-2">Unit (optional):</label>
+                    <div class="col-12 col-lg-3 col-xl-1 text-sm-start text-lg-end">
+                        <label class="form-label mt-2">Unit:</label>
                     </div>
-                    <div class="col-12 col-md-4 col-lg-4 col-xl-2">
+                    <div class="col-12 col-lg-4 col-xl-2">
                         <select class="form-select" name="recipe[ingredients][${ingredientIndex}][measurementShorthand]">
                             ${preferredSystem.value === 'metric' ? metricUnits.map(unit => `<option value="${unit.value}">${unit.text}</option>`) : imperialUnits.map(unit => `<option value="${unit.value}" data-system="${unit.system}">${unit.text}</option>`)}
                         </select>
                     </div>
-                    <div class="col-12 col-md-3 col-lg-3 col-xl-2 text-sm-start text-md-end text-lg-end">
+                    <div class="col-12 col-lg-3 col-xl-2 text-sm-start text-lg-end">
                         <label class="form-label mt-2">Ingredient name:</label>
                     </div>
-                    <div class="col-12 col-md-4 col-lg-5 col-xl-2">
-                        <input class="form-control" type="text" name="recipe[ingredients][${ingredientIndex}][ingredientName]" required>
+                    <div class="col-12 col-lg-5 col-xl-3">
+                        <input class="form-control text-lowercase" type="text" name="recipe[ingredients][${ingredientIndex}][ingredientName]" placeholder="-" required>
                     </div>
-                    <div class= "col-12 col-md-2 col-lg-2 col-xl-1 mt-3 mt-md-1">   
+                    <div class= "col-12 col-lg-2 col-xl-1 mt-3 mt-md-1">   
                         <button type="button" class="btn btn-danger" style="width: 100%;" onclick="deleteIngredient(this.parentNode.parentNode.parentNode); resetMeasurementSystem()">Delete</button>
                     </div>
                 </div>
@@ -263,5 +294,114 @@
                 stepIndex = steps.length;
             }
         }
+
+        // Custom Validation messages
+
+        function validatePreparationTime() {
+            const prepHours = document.getElementById('prepHours').value;
+            const prepMinutes = document.getElementById('prepMinutes').value;
+            const prepTimeValidation = document.getElementById('prepTimeValidation');
+
+            if (prepHours === '' && prepMinutes === '') {
+                document.getElementById('prepHours').required = true;
+                document.getElementById('prepMinutes').required = true;
+                const invalidMessage = createMessage('invalidMessage', 'text-danger', 'Please provide a preparation time');
+                prepTimeValidation.innerHTML = '';
+                prepTimeValidation.appendChild(invalidMessage);
+                return false;
+            } else {
+                document.getElementById('prepHours').required = false;
+                document.getElementById('prepMinutes').required = false;
+
+                const validMessage = createMessage('validMessage', 'text-success', 'Looks good!');
+                prepTimeValidation.innerHTML = '';
+                prepTimeValidation.appendChild(validMessage);
+                return true;
+            }
+        }
+
+        function validateIngredients() {
+            const ingredientsContainer = document.getElementById('ingredientsContainer')
+            const ingredientsValidation = document.getElementById('ingredientsValidation');
+            if (ingredientsContainer.childElementCount === 0) {
+                const invalidMessage = createMessage('invalidMessage', 'text-danger', 'Please add at least one ingredient to your recipe');
+                ingredientsValidation.innerHTML = '';
+                ingredientsValidation.appendChild(invalidMessage);
+                return false;
+            } else {
+                ingredientsValidation.innerHTML = '';
+                return true;
+            }
+        }
+
+        function validateMethod() {
+            const stepsContainer = document.getElementById('stepsContainer')
+            const methodValidation = document.getElementById('methodValidation');
+            if (stepsContainer.childElementCount === 0) {
+                const invalidMessage = createMessage('invalidMessage', 'text-danger', 'Please add at least one step to your recipe method');
+                methodValidation.innerHTML = '';
+                methodValidation.appendChild(invalidMessage);
+                return false;
+            } else {
+                methodValidation.innerHTML = '';
+                return true;
+            }
+        }
+
+        function createMessage(id, className, text) {
+            const message = document.createElement('div');
+            message.setAttribute('id', id);
+            message.classList.add(className);
+            message.innerHTML = `<small>${text}</small>`;
+            return message;
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const prepHours = document.getElementById('prepHours');
+            const prepMinutes = document.getElementById('prepMinutes');
+            const ingredientsContainer = document.getElementById('ingredientsContainer')
+            const stepsContainer = document.getElementById('stepsContainer')
+            const recipeForm = document.getElementById('recipeForm');
+            let formSubmitted = false;
+            recipeForm.addEventListener('submit', function () { formSubmitted = true })
+
+            function validateAndPreventSubmission(event) {
+                validatePreparationTime();
+                validateIngredients();
+                validateMethod();
+                if ((!validatePreparationTime()) || (!validateIngredients()) || (!validateMethod())) {
+                    event.preventDefault();
+                }
+            }
+
+            prepHours.addEventListener('change', function () {
+                if (formSubmitted) {
+                    validatePreparationTime();
+                }
+            });
+
+            prepMinutes.addEventListener('change', function () {
+                if (formSubmitted) {
+                    validatePreparationTime();
+                }
+            });
+
+            const observer = new MutationObserver(function (mutationsList, observer) {
+                for (const mutation of mutationsList) {
+                    if (mutation.type === 'childList' && formSubmitted) {
+                        validateIngredients();
+                        validateMethod();
+                    }
+                }
+            });
+
+            const observerConfig = { childList: true };
+
+            observer.observe(ingredientsContainer, observerConfig);
+            observer.observe(stepsContainer, observerConfig);
+
+            recipeForm.addEventListener('submit', validateAndPreventSubmission);
+        });
 
     </script>
