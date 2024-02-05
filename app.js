@@ -11,8 +11,9 @@ const LocalStrategy = require('passport-local');
 const User = require('./models/user')
 const app = express();
 
-const recipes = require('./routes/recipes');
-const reviews = require('./routes/reviews');
+const userRoutes = require('./routes/users');
+const recipeRoutes = require('./routes/recipes');
+const reviewRoutes = require('./routes/reviews');
 
 mongoose.connect('mongodb://localhost:27017/recipe-app');
 
@@ -51,19 +52,16 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
+    console.log(req.session);
+    res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     next();
 })
 
-app.get('/fakeUser', async (req, res) => {
-    const user = new User({ email: 'eleniii@gmail.com', username: 'eleniii' });
-    const newUser = await User.register(user, 'chicken');
-    res.send(newUser);
-})
-
-app.use('/recipes', recipes)
-app.use('/recipes/:id/reviews', reviews)
+app.use('/', userRoutes)
+app.use('/recipes', recipeRoutes)
+app.use('/recipes/:id/reviews', reviewRoutes)
 
 app.get('/', (req, res) => {
     res.render('home')

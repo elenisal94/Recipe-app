@@ -11,6 +11,14 @@
                 <a class="nav-link" href="/recipes">Recipes</a>
                 <a class="nav-link" href="/recipes/new">New Recipe</a>
             </div>
+            <div class="navbar-nav ms-auto">
+                <% if(!currentUser){ %>
+                    <a class="nav-link" href="/login">Login</a>
+                    <a class="nav-link" href="/signup">Signup</a>
+                    <% } else {%>
+                        <a class="nav-link" href="/logout">Logout</a>
+                        <% } %>
+            </div>
         </div>
     </div>
 </nav>

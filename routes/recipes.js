@@ -7,7 +7,8 @@ const convert = require('convert-units');
 const { getCountryInfo, countryInfoData } = require('../utils/countryInfo')
 const { expandOrShortenUnit, metricShorthandData, imperialShorthandData } = require('../utils/shorthand')
 const { convertToMetric, convertToImperial } = require('../utils/convertUnitAmount');
-const { recipeSchema } = require('../schemas.js')
+const { recipeSchema } = require('../schemas.js');
+const { isLoggedIn } = require('../middleware');
 
 
 const validateRecipe = (req, res, next) => {
@@ -25,11 +26,11 @@ router.get('/', async (req, res) => {
     res.render('recipes/index', { recipes });
 });
 
-router.get('/new', (req, res) => {
+router.get('/new', isLoggedIn, (req, res) => {
     res.render('recipes/new', { countryInfoData, metricShorthandData, imperialShorthandData });
 })
 
-router.post('/', validateRecipe, catchAsync(async (req, res, next) => {
+router.post('/', isLoggedIn, validateRecipe, catchAsync(async (req, res, next) => {
     const recipeData = req.body.recipe;
     const selectedCountryCode = recipeData.countryCode;
     const countryData = getCountryInfo(selectedCountryCode);
@@ -87,7 +88,7 @@ router.get('/:id', catchAsync(async (req, res) => {
     res.render('recipes/show', { recipe, convertedIngredients, roundValue });
 }));
 
-router.get('/:id/edit', catchAsync(async (req, res) => {
+router.get('/:id/edit', isLoggedIn, catchAsync(async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) {
         req.flash('error', 'Cannot find that recipe!')
@@ -105,7 +106,7 @@ router.get('/:id/edit', catchAsync(async (req, res) => {
     res.render('recipes/edit', { recipe, countryInfoData, metricShorthandData, imperialShorthandData, convertedIngredients })
 }))
 
-router.put('/:id', validateRecipe, catchAsync(async (req, res) => {
+router.put('/:id', isLoggedIn, validateRecipe, catchAsync(async (req, res) => {
     try {
         const { id } = req.params;
         const recipeData = req.body.recipe;
@@ -137,7 +138,7 @@ router.put('/:id', validateRecipe, catchAsync(async (req, res) => {
     }
 }));
 
-router.delete('/:id', catchAsync(async (req, res) => {
+router.delete('/:id', isLoggedIn, catchAsync(async (req, res) => {
     const { id } = req.params;
     await Recipe.findByIdAndDelete(id);
     req.flash('success', 'Successfully deleted recipe')
