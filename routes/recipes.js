@@ -53,7 +53,8 @@ router.post('/', isLoggedIn, validateRecipe, catchAsync(async (req, res, next) =
 
 
 router.get('/:id', catchAsync(async (req, res) => {
-    const recipe = await Recipe.findById(req.params.id).populate('reviews').populate('author');
+    const recipe = await Recipe.findById(req.params.id).populate({ path: 'reviews', populate: { path: 'author' } }).populate('author');
+    console.log(recipe)
     if (!recipe) {
         req.flash('error', 'Cannot find that recipe!')
         return res.redirect('/recipes');

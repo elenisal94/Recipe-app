@@ -71,37 +71,45 @@
             </div>
         </div>
         <div class="col-12 col-xl-6 mt-4">
-            <h2>Rate this recipe</h2>
-            <form action="/recipes/<%=recipe._id%>/reviews" method="POST" class="mb-3 validated-form" novalidate>
-                <div class="mb-3">
-                    <label class="form-label" for="rating">Rating</label>
-                    <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="body">Review</label>
-                    <textarea class="form-control" name="review[body]" id="" cols="30" rows="3" required></textarea>
-                    <div class="valid-feedback">
-                        Looks good!
+            <% if(currentUser) {%>
+                <h2>Rate this recipe</h2>
+                <form action="/recipes/<%=recipe._id%>/reviews" method="POST" class="mb-3 validated-form" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label" for="rating">Rating</label>
+                        <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating"
+                            required>
                     </div>
-                    <div class="invalid-feedback">
-                        Please tell us what you think of this recipe
+                    <div class="mb-3">
+                        <label class="form-label" for="body">Review</label>
+                        <textarea class="form-control" name="review[body]" id="" cols="30" rows="3" required></textarea>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please tell us what you think of this recipe
+                        </div>
                     </div>
-                </div>
-                <button class="btn btn-success">Submit</button>
-            </form>
-            <% for (let review of recipe.reviews){ %>
-                <div class="mb-3 card">
-                    <div class=" card-body">
-                        <h5 class="card-title">Rating: <%= review.rating %>
-                        </h5>
-                        <p class="card-text"> Review: <%= review.body %>
-                        </p>
-                        <form action="/recipes/<%=recipe._id%>/reviews/<%=review._id%>?_method=DELETE" method="POST">
-                            <button class="btn btn-sm btn-danger">Delete</button>
-                        </form>
-                    </div>
-                </div>
+                    <button class="btn btn-success">Submit</button>
+                </form>
                 <% } %>
+                    <% for (let review of recipe.reviews){ %>
+                        <div class="mb-3 card">
+                            <div class=" card-body">
+                                <h5 class="card-title">Rating: <%= review.rating %>
+                                </h5>
+                                <h6 class="card-subtitle mb-2 text-muted">By: <%= review.author.username %>
+                                </h6>
+                                <p class="card-text"> Review: <%= review.body %>
+                                </p>
+                                <% if( currentUser && review.author.equals(currentUser._id)) { %>
+                                    <form action="/recipes/<%=recipe._id%>/reviews/<%=review._id%>?_method=DELETE"
+                                        method="POST">
+                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                    <% } %>
+                            </div>
+                        </div>
+                        <% } %>
         </div>
     </div>
     </div>
