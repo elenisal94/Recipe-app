@@ -60,12 +60,14 @@
                         </ol>
                     </li>
                 </ul>
-                <div class="card-body">
-                    <a class="card-link btn btn-warning" href="/recipes/<%=recipe._id%>/edit">Edit</a>
-                    <form class="d-inline" action="/recipes/<%=recipe._id%>?_method=DELETE" method="POST">
-                        <button class="btn btn-danger">Delete</button>
-                    </form>
-                </div>
+                <% if( currentUser && recipe.author.equals(currentUser._id)) { %>
+                    <div class="card-body">
+                        <a class="card-link btn btn-warning" href="/recipes/<%=recipe._id%>/edit">Edit</a>
+                        <form class="d-inline" action="/recipes/<%=recipe._id%>?_method=DELETE" method="POST">
+                            <button class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                    <% } %>
             </div>
         </div>
         <div class="col-12 col-xl-6 mt-4">

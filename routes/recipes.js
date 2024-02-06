@@ -7,19 +7,7 @@ const convert = require('convert-units');
 const { getCountryInfo, countryInfoData } = require('../utils/countryInfo')
 const { expandOrShortenUnit, metricShorthandData, imperialShorthandData } = require('../utils/shorthand')
 const { convertToMetric, convertToImperial } = require('../utils/convertUnitAmount');
-const { recipeSchema } = require('../schemas.js');
-const { isLoggedIn } = require('../middleware');
-
-
-const validateRecipe = (req, res, next) => {
-    const { error } = recipeSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400)
-    } else {
-        next();
-    }
-}
+const { isLoggedIn, validateRecipe, isAuthor } = require('../middleware');
 
 router.get('/', async (req, res) => {
     const recipes = await Recipe.find({});
@@ -86,7 +74,7 @@ router.get('/:id', catchAsync(async (req, res) => {
     res.render('recipes/show', { recipe, convertedIngredients, roundValue });
 }));
 
-router.get('/:id/edit', isLoggedIn, catchAsync(async (req, res) => {
+router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) {
         req.flash('error', 'Cannot find that recipe!')
@@ -104,7 +92,7 @@ router.get('/:id/edit', isLoggedIn, catchAsync(async (req, res) => {
     res.render('recipes/edit', { recipe, countryInfoData, metricShorthandData, imperialShorthandData, convertedIngredients })
 }))
 
-router.put('/:id', isLoggedIn, validateRecipe, catchAsync(async (req, res) => {
+router.put('/:id', isLoggedIn, isAuthor, validateRecipe, catchAsync(async (req, res) => {
     try {
         const { id } = req.params;
         const recipeData = req.body.recipe;
@@ -136,7 +124,7 @@ router.put('/:id', isLoggedIn, validateRecipe, catchAsync(async (req, res) => {
     }
 }));
 
-router.delete('/:id', isLoggedIn, catchAsync(async (req, res) => {
+router.delete('/:id', isLoggedIn, isAuthor, catchAsync(async (req, res) => {
     const { id } = req.params;
     await Recipe.findByIdAndDelete(id);
     req.flash('success', 'Successfully deleted recipe')
