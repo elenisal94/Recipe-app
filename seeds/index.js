@@ -64,6 +64,7 @@ const seedDB = async () => {
         });
         const recipe = new Recipe({
             title: `${sample(descriptors)} ${sample(foodNames)}`,
+            author: '65c1108c3f491303bd37d4fe',
             image: 'https://source.unsplash.com/random?food',
             prepHours,
             prepMinutes,

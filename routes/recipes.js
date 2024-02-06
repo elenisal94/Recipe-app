@@ -32,6 +32,7 @@ router.get('/new', isLoggedIn, (req, res) => {
 
 router.post('/', isLoggedIn, validateRecipe, catchAsync(async (req, res, next) => {
     const recipeData = req.body.recipe;
+    recipeData.author = req.user._id;
     const selectedCountryCode = recipeData.countryCode;
     const countryData = getCountryInfo(selectedCountryCode);
     recipeData.countryFullname = countryData.countryFullname;
@@ -42,12 +43,9 @@ router.post('/', isLoggedIn, validateRecipe, catchAsync(async (req, res, next) =
 
     if (Array.isArray(ingredientsArray)) {
         const conversionPromises = ingredientsArray.map(async (ingredient) => {
-            console.log('Before conversion:', ingredient.measurementShorthand, typeof ingredient.measurementShorthand);
             const conversionResult = await convertToMetric(ingredient.amount, ingredient.measurementShorthand, selectedSystem);
-            console.log('After conversion:', conversionResult.targetUnit, typeof conversionResult.targetUnit);
             ingredient.amount = conversionResult.convertedAmount;
             ingredient.measurementShorthand = conversionResult.targetUnit;
-            console.log('Final value:', ingredient.measurementShorthand, typeof ingredient.measurementShorthand);
             ingredient.measurementUnit = expandOrShortenUnit(ingredient.measurementShorthand, selectedSystem);
             return ingredient;
         });
@@ -67,7 +65,7 @@ router.post('/', isLoggedIn, validateRecipe, catchAsync(async (req, res, next) =
 
 
 router.get('/:id', catchAsync(async (req, res) => {
-    const recipe = await Recipe.findById(req.params.id).populate('reviews');
+    const recipe = await Recipe.findById(req.params.id).populate('reviews').populate('author');
     if (!recipe) {
         req.flash('error', 'Cannot find that recipe!')
         return res.redirect('/recipes');

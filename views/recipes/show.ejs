@@ -13,12 +13,15 @@
                     </p>
                 </div>
                 <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <%= `Submitted by: ${recipe.author.username}` %>
+                    </li>
                     <li class="list-group-item text-muted">
-                        <%= `${recipe.countryFullname} ${recipe.countryFlag}` %>
+                        <%= `Recipe origin: ${recipe.countryFullname} ${recipe.countryFlag}` %>
                     </li>
                     <li class="list-group-item">
-                        <%= `${recipe.prepHours ? recipe.prepHours + (recipe.prepHours===1 ? " hour" : " hours" ) : "" }
-                            ${recipe.prepMinutes ? recipe.prepMinutes + " minutes" : "" }` %>
+                        <%= `Time needed: ${recipe.prepHours ? recipe.prepHours + (recipe.prepHours===1 ? " hour"
+                            : " hours" ) : "" } ${recipe.prepMinutes ? recipe.prepMinutes + " minutes" : "" }` %>
                     </li>
                     <li class="list-group-item">For <%= recipe.serves %> people</li>
                     <li class="list-group-item"> Ingredients:
