@@ -4,18 +4,17 @@ const recipes = require('../controllers/recipes');
 const catchAsync = require('../helper/catchAsync');
 const { isLoggedIn, validateRecipe, isAuthor } = require('../middleware');
 
-router.get('/', catchAsync(recipes.index));
+router.route('/')
+    .get(catchAsync(recipes.index))
+    .post(isLoggedIn, validateRecipe, catchAsync(recipes.createRecipe));
 
-router.get('/new', isLoggedIn, recipes.renderNewForm)
+router.get('/new', isLoggedIn, recipes.renderNewForm);
 
-router.post('/', isLoggedIn, validateRecipe, catchAsync(recipes.createRecipe));
-
-router.get('/:id', catchAsync(recipes.showRecipe));
+router.route('/:id')
+    .get(catchAsync(recipes.showRecipe))
+    .put(isLoggedIn, isAuthor, validateRecipe, catchAsync(recipes.updateRecipe))
+    .delete(isLoggedIn, isAuthor, catchAsync(recipes.deleteRecipe));
 
 router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(recipes.renderEditForm));
-
-router.put('/:id', isLoggedIn, isAuthor, validateRecipe, catchAsync(recipes.updateRecipe))
-
-router.delete('/:id', isLoggedIn, isAuthor, catchAsync(recipes.deleteRecipe));
 
 module.exports = router;
