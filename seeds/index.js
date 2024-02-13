@@ -65,7 +65,23 @@ const seedDB = async () => {
         const recipe = new Recipe({
             title: `${sample(descriptors)} ${sample(foodNames)}`,
             author: '65c1108c3f491303bd37d4fe',
-            image: 'https://source.unsplash.com/random?food',
+            images: [
+                {
+                    url: 'https://res.cloudinary.com/dr35pjw8f/image/upload/v1707847727/ElenisRecipeParadise/cw9r4zqhogmi6hxppnwv.jpg',
+                    filename: 'ElenisRecipeParadise/cw9r4zqhogmi6hxppnwv',
+                    altText: 'soup'
+                },
+                {
+                    url: 'https://res.cloudinary.com/dr35pjw8f/image/upload/v1707847730/ElenisRecipeParadise/jfaatb47kktnbdqgel9x.jpg',
+                    filename: 'ElenisRecipeParadise/jfaatb47kktnbdqgel9x',
+                    altText: 'avocado and toast'
+                },
+                {
+                    url: 'https://res.cloudinary.com/dr35pjw8f/image/upload/v1707847730/ElenisRecipeParadise/ilfvj5vtbb64jxnczobq.jpg',
+                    filename: 'ElenisRecipeParadise/ilfvj5vtbb64jxnczobq',
+                    altText: 'salad'
+                }
+            ],
             prepHours,
             prepMinutes,
             serves: `${Math.floor(Math.random() * 6) + 1}`,
