@@ -3,10 +3,13 @@ const router = express.Router();
 const recipes = require('../controllers/recipes');
 const catchAsync = require('../helper/catchAsync');
 const { isLoggedIn, validateRecipe, isAuthor } = require('../middleware');
+const multer = require('multer');
+const { storage } = require('../cloudinary');
+const upload = multer({ storage });
 
 router.route('/')
     .get(catchAsync(recipes.index))
-    .post(isLoggedIn, validateRecipe, catchAsync(recipes.createRecipe));
+    .post(isLoggedIn, upload.array('image'), validateRecipe, catchAsync(recipes.createRecipe));
 
 router.get('/new', isLoggedIn, recipes.renderNewForm);
 

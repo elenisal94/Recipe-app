@@ -36,6 +36,7 @@ module.exports.createRecipe = async (req, res, next) => {
         try {
             const convertedIngredients = await Promise.all(conversionPromises);
             const recipe = new Recipe({ ...recipeData, ingredients: convertedIngredients });
+            recipe.images = req.files.map((f, i) => ({ url: f.path, filename: f.filename, altText: req.body.altText[i] }));
             await recipe.save();
             req.flash('success', 'Successfully created a new recipe!');
             res.redirect(`/recipes/${recipe._id}`);

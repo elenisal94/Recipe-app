@@ -3,7 +3,8 @@
     <div class="row">
         <h1 class="text-center">New Recipe</h1>
         <div class="col-10 offset-1">
-            <form id="recipeForm" action="/recipes" method="POST" novalidate class="validated-form">
+            <form id="recipeForm" action="/recipes" method="POST" novalidate class="validated-form"
+                enctype="multipart/form-data">
                 <div class="mb-3">
                     <h3>General Info</h3>
                     <label class="form-label" for="title">Recipe name:</label>
@@ -41,18 +42,20 @@
                             </option>
                             <% }); %>
                     </select>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="image">Recipe image URL:</label>
-                    <input class="form-control" type="url" id="image" name="recipe[image]" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-                    <div class="invalid-feedback">
-                        Please provide a valid URL
+                    <div>
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Upload recipe images:</label>
+                            <input type="file" id="fileInput" class="form-control" name="image" multiple required>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
+                            <div class="invalid-feedback">
+                                Please provide at least one image for your recipe
+                            </div>
+                        </div>
+                        <div class="previewContainer" id="previewContainer"></div>
                     </div>
                 </div>
 
@@ -161,9 +164,58 @@
         </div>
     </div>
 
-
-
     <script>
+
+        function previewImages(event) {
+            const input = event.target;
+            const container = document.getElementById('previewContainer');
+            const formData = new FormData();
+
+            // Clear any existing preview content
+            container.innerHTML = '';
+
+            if (input.files && input.files.length > 0) {
+                for (let i = 0; i < input.files.length; i++) {
+                    const reader = new FileReader();
+                    const file = input.files[i];
+
+                    // Create a container div for each image and input field
+                    const previewContainer = document.createElement('div');
+                    previewContainer.classList.add('previewContainer');
+                    container.appendChild(previewContainer);
+
+                    // Create a new image element for each file
+                    const previewImage = document.createElement('img');
+                    previewImage.classList.add('previewImage', 'img-thumbnail');
+                    previewContainer.appendChild(previewImage);
+
+                    // Create an input field for alt text
+                    const altInput = document.createElement('input');
+                    altInput.setAttribute('type', 'text');
+                    altInput.setAttribute('name', `altText[${i}]`);
+                    altInput.setAttribute('placeholder', 'Image description');
+                    altInput.setAttribute('maxlength', '300');
+                    altInput.classList.add('form-control');
+                    altInput.required = true;
+                    previewContainer.appendChild(altInput);
+
+                    // Read the file contents and set the src attribute of the preview image
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        formData.append(`image[${i}]`, file); // Append each image file to the FormData
+                    };
+
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        // Attach event listener to the file input element
+        const fileInput = document.getElementById('fileInput');
+        fileInput.addEventListener('change', previewImages);
+
+
+
         UpdateHiddenInput();
 
         function UpdateHiddenInput() {
@@ -405,3 +457,18 @@
         });
 
     </script>
+
+    <style>
+        .previewContainer {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .previewImage {
+            max-width: 200px;
+            max-height: 200px;
+        }
+    </style>

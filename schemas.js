@@ -3,7 +3,6 @@ const Joi = require('joi');
 module.exports.recipeSchema = Joi.object({
     recipe: Joi.object({
         title: Joi.string().max(150).required(),
-        image: Joi.string().required(),
         description: Joi.string().max(1400).required(),
         prepHours: Joi.number().min(0).allow(null, ''),
         prepMinutes: Joi.number().min(0).allow(null, ''),
@@ -24,7 +23,8 @@ module.exports.recipeSchema = Joi.object({
             return helpers.message('At least one of hours or minutes must be provided.');
         }
         return value;
-    })
+    }),
+    altText: Joi.array().items(Joi.string().max(300)).required(),
 })
 
 module.exports.reviewSchema = Joi.object({
