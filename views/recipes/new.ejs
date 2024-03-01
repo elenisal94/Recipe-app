@@ -47,15 +47,23 @@
                     <div>
                         <div class="mb-3">
                             <label for="fileInput" class="form-label">Upload recipe images:</label>
-                            <input type="file" id="fileInput" class="form-control" name="image" multiple required>
+                            <input type="file" id="fileInput" class="form-control" name="recipe[images]" multiple
+                                required>
                             <div class="valid-feedback">
                                 Looks good!
                             </div>
                             <div class="invalid-feedback">
                                 Please provide at least one image for your recipe
                             </div>
+                            <div id="imagesValidation" class="">
+                                <!-- Images Validation messages will be displayed here -->
+                            </div>
                         </div>
-                        <div class="previewContainer" id="previewContainer"></div>
+                        <div class="row row-cols-1 row-cols-lg-3 row-cols-md-2 g-4 mb-3" id="previewContainer"></div>
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-danger" id="clearButton" id="clearButton"
+                                style="display: none;" onclick="clearFileInput()">Clear image selection</button>
+                        </div>
                     </div>
                 </div>
 
@@ -166,12 +174,18 @@
 
     <script>
 
-        function previewImages(event) {
-            const input = event.target;
+        function clearFileInput() {
             const container = document.getElementById('previewContainer');
+            const fileInput = document.getElementById('fileInput');
+            fileInput.value = '';
+            container.innerHTML = '';
+        }
+
+        function previewImages(event) {
+            const container = document.getElementById('previewContainer');
+            const input = event.target;
             const formData = new FormData();
 
-            // Clear any existing preview content
             container.innerHTML = '';
 
             if (input.files && input.files.length > 0) {
@@ -179,59 +193,66 @@
                     const reader = new FileReader();
                     const file = input.files[i];
 
-                    // Create a container div for each image and input field
-                    const previewContainer = document.createElement('div');
-                    previewContainer.classList.add('previewContainer');
-                    container.appendChild(previewContainer);
+                    const miniContainer = document.createElement('div');
+                    miniContainer.classList.add('minicontainer');
+                    miniContainer.innerHTML = `
+                    <div class="card h-100">
+                            <div class="card-body d-flex justify-content-center align-items-center h-75">
+                                <img class="card-img img-thumbnail previewImage mx-auto">
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-end align-items-center">
+                                <label class="form-label" name="altTextLabel[]" for="altText${i}">Image ${i + 1} description:</label>
+                                <input type="text" name="altText[${i}]" id="altText${i}" placeholder="Image description" maxlength="300" class="form-control" required>
+                            </div>
+                    </div>`;
+                    container.appendChild(miniContainer);
 
-                    // Create a new image element for each file
-                    const previewImage = document.createElement('img');
-                    previewImage.classList.add('previewImage', 'img-thumbnail');
-                    previewContainer.appendChild(previewImage);
-
-                    // Create an input field for alt text
-                    const altInput = document.createElement('input');
-                    altInput.setAttribute('type', 'text');
-                    altInput.setAttribute('name', `altText[${i}]`);
-                    altInput.setAttribute('placeholder', 'Image description');
-                    altInput.setAttribute('maxlength', '300');
-                    altInput.classList.add('form-control');
-                    altInput.required = true;
-                    previewContainer.appendChild(altInput);
-
-                    // Read the file contents and set the src attribute of the preview image
                     reader.onload = function (e) {
+                        const previewImage = miniContainer.querySelector('.previewImage');
                         previewImage.src = e.target.result;
-                        formData.append(`image[${i}]`, file); // Append each image file to the FormData
+                        formData.append(`image[${i}]`, file);
                     };
 
                     reader.readAsDataURL(file);
                 }
             }
+            updateClearButtonVisibility();
         }
 
-        // Attach event listener to the file input element
         const fileInput = document.getElementById('fileInput');
         fileInput.addEventListener('change', previewImages);
 
+        function clearFileInput() {
+            const fileInput = document.getElementById('fileInput');
+            fileInput.value = '';
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = '';
+            updateClearButtonVisibility();
+        }
 
+        function updateClearButtonVisibility() {
+            const clearButton = document.getElementById('clearButton');
+            const container = document.getElementById('previewContainer');
+            clearButton.style.display = container.children.length ? 'flex' : 'none';
+        }
 
         UpdateHiddenInput();
 
         function UpdateHiddenInput() {
             const selectedSystem = document.getElementById('preferredSystem').value;
             document.getElementById('measurementSystemHidden').value = selectedSystem
-            console.log(document.getElementById('measurementSystemHidden').value)
         }
 
+
+        const ingredientsContainer = document.getElementById('ingredientsContainer');
         let ingredientIndex = 0;
-        function addIngredient() {
-            const container = document.getElementById('ingredientsContainer');
+
+        async function addIngredient() {
             const ingredientInputs = document.createElement('div');
             const preferredSystem = document.getElementById('preferredSystem');
             const metricUnits = [{ value: null, text: '-' },
             { value: "l", text: "liters" },
-            { value: "g", text: "grams", },
+            { value: "g", text: "grams" },
             { value: "ml", text: "milliliters" },
             { value: "kg", text: "kilograms" },
             { value: "tsp", text: "teaspoons" },
@@ -252,26 +273,26 @@
 
             ingredientInputs.innerHTML = `
             <div class="list-group-item">
-                <div class="row g-1">
+                <div class="row g-1 ingredient">
                     <div class="col-12 col-lg-2 col-xl-1 text-sm-start text-lg-end">
-                            <label class="form-label mt-2">Amount:</label>
+                            <label class="form-label mt-2" for="ingredientAmount${ingredientIndex}">Amount:</label>
                     </div>
                     <div class="col-12 col-lg-3 col-xl-2">
-                        <input type="number" min="0" class="form-control" step="any" name="recipe[ingredients][${ingredientIndex}][amount]" placeholder="-">
+                        <input type="number" min="0" class="form-control" id="ingredientAmount${ingredientIndex}" name="recipe[ingredients][${ingredientIndex}][amount]" placeholder="-">
                     </div>
                     <div class="col-12 col-lg-3 col-xl-1 text-sm-start text-lg-end">
-                        <label class="form-label mt-2">Unit:</label>
+                        <label class="form-label mt-2" for="ingredientUnit${ingredientIndex}">Unit:</label>
                     </div>
                     <div class="col-12 col-lg-4 col-xl-2">
-                        <select class="form-select" name="recipe[ingredients][${ingredientIndex}][measurementShorthand]">
+                        <select class="form-select" id="ingredientUnit${ingredientIndex}" name="recipe[ingredients][${ingredientIndex}][measurementShorthand]">
                             ${preferredSystem.value === 'metric' ? metricUnits.map(unit => `<option value="${unit.value}">${unit.text}</option>`) : imperialUnits.map(unit => `<option value="${unit.value}" data-system="${unit.system}">${unit.text}</option>`)}
                         </select>
                     </div>
                     <div class="col-12 col-lg-3 col-xl-2 text-sm-start text-lg-end">
-                        <label class="form-label mt-2">Ingredient name:</label>
+                        <label class="form-label mt-2" for="ingredientName${ingredientIndex}">Ingredient name:</label>
                     </div>
                     <div class="col-12 col-lg-5 col-xl-3">
-                        <input class="form-control text-lowercase" type="text" name="recipe[ingredients][${ingredientIndex}][ingredientName]" placeholder="-" required>
+                        <input class="form-control text-lowercase" id="ingredientName${ingredientIndex}" type="text" name="recipe[ingredients][${ingredientIndex}][ingredientName]" placeholder="-" required>
                     </div>
                     <div class= "col-12 col-lg-2 col-xl-1 mt-3 mt-md-1 ms-lg-auto">   
                         <button type="button" class="btn btn-danger" style="width: 100%;" onclick="deleteIngredient(this.parentNode.parentNode.parentNode); resetMeasurementSystem()">Delete</button>
@@ -279,13 +300,66 @@
                 </div>
             </div>
                 `;
-            container.appendChild(ingredientInputs);
-            ingredientIndex++;
+            ingredientsContainer.appendChild(ingredientInputs);
             disableMeasurementSystem();
+            ingredientIndex++;
+            updateIngredientIndexes()
+        }
+
+        function getIngredients() {
+            return Array.from(document.querySelectorAll('.ingredient'));
+        }
+
+        function updateIngredientIndexes() {
+            const amountInputs = document.querySelectorAll('input[name^="recipe[ingredients]"][name$="[amount]"]');
+            const unitSelects = document.querySelectorAll('select[name^="recipe[ingredients]"][name$="[measurementShorthand]"]');
+            const nameInputs = document.querySelectorAll('input[name^="recipe[ingredients]"][name$="[ingredientName]"]');
+            const labelForAmounts = document.querySelectorAll('label[for^="ingredientAmount"]');
+            const labelForUnits = document.querySelectorAll('label[for^="ingredientUnit"]');
+            const labelForNames = document.querySelectorAll('label[for^="ingredientName"]');
+
+            amountInputs.forEach((amountInput, index) => {
+                amountInput.id = `ingredientAmount${index}`;
+                amountInput.name = `recipe[ingredients][${index}][amount]`;
+            });
+
+            unitSelects.forEach((unitSelect, index) => {
+                unitSelect.id = `ingredientUnit${index}`;
+                unitSelect.name = `recipe[ingredients][${index}][measurementShorthand]`;
+            });
+
+            nameInputs.forEach((nameInput, index) => {
+                nameInput.id = `ingredientName${index}`;
+                nameInput.name = `recipe[ingredients][${index}][ingredientName]`;
+            });
+
+            labelForAmounts.forEach((labelForAmount, index) => {
+                labelForAmount.setAttribute('for', `ingredientAmount${index}`);
+            });
+
+            labelForUnits.forEach((labelForUnit, index) => {
+                labelForUnit.setAttribute('for', `ingredientUnit${index}`);
+            });
+
+            labelForNames.forEach((labelForName, index) => {
+                labelForName.setAttribute('for', `ingredientName${index}`);
+            });
+        }
+
+
+        function deleteIngredient(button) {
+            const ingredientToRemove = button.parentNode;
+            const ingredients = Array.from(document.querySelectorAll('.ingredient'));
+
+            const deletedIndex = ingredients.indexOf(ingredientToRemove);
+
+            ingredients.splice(deletedIndex, 1);
+            ingredientToRemove.remove();
+
+            updateIngredientIndexes();
         }
 
         function disableMeasurementSystem() {
-            const ingredientsContainer = document.getElementById('ingredientsContainer');
             const preferredSystem = document.getElementById('preferredSystem');
             if (ingredientsContainer.children.length > 0) {
                 preferredSystem.disabled = true;
@@ -293,53 +367,51 @@
         }
 
         function resetMeasurementSystem() {
-            const ingredientsContainer = document.getElementById('ingredientsContainer');
             const measureSystemSelect = document.getElementById('preferredSystem');
             if (ingredientsContainer.children.length === 0) {
                 measureSystemSelect.disabled = false;
             }
         }
 
-        function deleteIngredient(button) {
-            button.parentNode.remove();
-        }
-
         let stepIndex = 0;
+        const stepsContainer = document.getElementById('stepsContainer');
+
         function addStep() {
-            const container = document.getElementById('stepsContainer');
             const stepInput = document.createElement('div');
             stepInput.innerHTML = `
                 <div class="row mb-2">
                     <div class="col-12 col-xl-1">
-                        <label class="form-label mt-2">Step ${stepIndex + 1}:</label>
+                        <label for="recipeMethod${stepIndex}" class="form-label mt-2">Step ${stepIndex + 1}:</label>
                     </div>
                     <div class="col-12 col-xl-10">
-                        <textarea class="form-control" name="recipe[method][${stepIndex}]" rows="1" cols="50" required></textarea>
+                        <textarea class="form-control" id="recipeMethod${stepIndex}" name="recipe[method][${stepIndex}]" rows="1" cols="50" required></textarea>
                     </div>
                     <div class="col-xl-1">
                         <button type="button" class="btn btn-danger float-end mt-2 mt-xl-0" onclick="deleteStep(this.parentNode.parentNode)">Delete</button>
                     </div>
                 </div>
             `;
-            container.appendChild(stepInput);
+            stepsContainer.appendChild(stepInput);
             stepIndex++;
         }
 
         function deleteStep(button) {
-            const container = document.getElementById('stepsContainer');
-            const steps = Array.from(container.children);
+            const steps = Array.from(stepsContainer.children);
             const deletedIndex = steps.indexOf(button.parentNode);
             button.parentNode.remove();
             updateStepNumbers(deletedIndex);
         }
 
         function updateStepNumbers(deletedIndex) {
-            const container = document.getElementById('stepsContainer');
-            const steps = Array.from(container.children);
+            const steps = Array.from(stepsContainer.children);
             steps.forEach((step, index) => {
                 const label = step.querySelector('label');
                 const textarea = step.querySelector('textarea');
+
                 label.textContent = `Step ${index + 1}:`;
+                label.setAttribute('for', `recipeMethod${index}`);
+
+                textarea.id = `recipeMethod${index}`;
                 textarea.name = `recipe[method][${index}]`;
             });
             if (deletedIndex !== undefined) {
@@ -373,7 +445,6 @@
         }
 
         function validateIngredients() {
-            const ingredientsContainer = document.getElementById('ingredientsContainer')
             const ingredientsValidation = document.getElementById('ingredientsValidation');
             if (ingredientsContainer.childElementCount === 0) {
                 const invalidMessage = createMessage('invalidMessage', 'text-danger', 'Please add at least one ingredient to your recipe');
@@ -387,7 +458,6 @@
         }
 
         function validateMethod() {
-            const stepsContainer = document.getElementById('stepsContainer')
             const methodValidation = document.getElementById('methodValidation');
             if (stepsContainer.childElementCount === 0) {
                 const invalidMessage = createMessage('invalidMessage', 'text-danger', 'Please add at least one step to your recipe method');
@@ -412,11 +482,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             const prepHours = document.getElementById('prepHours');
             const prepMinutes = document.getElementById('prepMinutes');
-            const ingredientsContainer = document.getElementById('ingredientsContainer')
-            const stepsContainer = document.getElementById('stepsContainer')
             const recipeForm = document.getElementById('recipeForm');
             let formSubmitted = false;
             recipeForm.addEventListener('submit', function () { formSubmitted = true })
+
 
             function validateAndPreventSubmission(event) {
                 validatePreparationTime();
@@ -439,6 +508,11 @@
                 }
             });
 
+            function clearImagesValidation(event) {
+                imagesValidation = document.getElementById('imagesValidation');
+                imagesValidation.innerHTML = ''
+            }
+
             const observer = new MutationObserver(function (mutationsList, observer) {
                 for (const mutation of mutationsList) {
                     if (mutation.type === 'childList' && formSubmitted) {
@@ -453,22 +527,68 @@
             observer.observe(ingredientsContainer, observerConfig);
             observer.observe(stepsContainer, observerConfig);
 
-            recipeForm.addEventListener('submit', validateAndPreventSubmission);
+            recipeForm.addEventListener('submit', function (event) {
+                validateAndPreventSubmission(event);
+                clearImagesValidation(event);
+            });
+
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const maxImages = 10;
+            const maxImageSizeBytes = 1000000; // Maximum image size in bytes (1 MB)
+            const allowedExtensions = ['jpeg', 'jpg', 'png']; // Allowed file extensions
+
+            fileInput.addEventListener('change', (event) => {
+                const files = event.target.files;
+                let totalSize = 0;
+                let valid = true;
+                imagesValidation.innerHTML = '';
+
+                // Check the number of files
+                if (files.length > maxImages) {
+                    const invalidMessage = createMessage('invalidMessage', 'text-danger', `You can upload a maximum of ${maxImages} images.`);
+                    imagesValidation.innerHTML = '';
+                    imagesValidation.appendChild(invalidMessage);
+                    valid = false;
+                }
+
+                // Check the size and type of each file
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    totalSize += file.size;
+
+                    // Check file size
+                    if (file.size > maxImageSizeBytes) {
+                        const invalidMessage = createMessage('invalidMessage', 'text-danger', `File "${file.name}" exceeds the maximum size of 1MB. Please choose another image or try compress your image at https://compressjpeg.com/ `);
+                        imagesValidation.innerHTML = '';
+                        imagesValidation.appendChild(invalidMessage);
+                        valid = false;
+                    }
+
+                    // Check file type (extension)
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+                    if (!allowedExtensions.includes(fileExtension)) {
+                        const invalidMessage = createMessage('invalidMessage', 'text-danger', `"${file.name}" is an invalid file type. Please make sure your images are one of the following: jpeg, jpg, png`);
+                        imagesValidation.innerHTML = '';
+                        imagesValidation.appendChild(invalidMessage);
+                        valid = false;
+                    }
+                }
+
+                // If any validation failed, clear the file input
+                if (!valid) {
+                    clearFileInput()
+                }
+            });
         });
 
     </script>
 
     <style>
-        .previewContainer {
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
         .previewImage {
             max-width: 200px;
-            max-height: 200px;
+            max-height: 300px;
         }
     </style>

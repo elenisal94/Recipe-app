@@ -72,11 +72,6 @@ const seedDB = async () => {
                     altText: 'soup'
                 },
                 {
-                    url: 'https://res.cloudinary.com/dr35pjw8f/image/upload/v1707847730/ElenisRecipeParadise/jfaatb47kktnbdqgel9x.jpg',
-                    filename: 'ElenisRecipeParadise/jfaatb47kktnbdqgel9x',
-                    altText: 'avocado and toast'
-                },
-                {
                     url: 'https://res.cloudinary.com/dr35pjw8f/image/upload/v1707847730/ElenisRecipeParadise/ilfvj5vtbb64jxnczobq.jpg',
                     filename: 'ElenisRecipeParadise/ilfvj5vtbb64jxnczobq',
                     altText: 'salad'

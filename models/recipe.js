@@ -2,15 +2,24 @@ const mongoose = require('mongoose');
 const Review = require('./review');
 const Schema = mongoose.Schema;
 
+const imageSchema = new mongoose.Schema({
+    url: String,
+    filename: String,
+    altText: { type: String, maxlength: 300 }
+});
+
 const RecipeSchema = new Schema({
     title: { type: String, required: true, maxlength: 150 },
-    images: [
+    images: {
+        type: [imageSchema],
+        validate:
         {
-            url: String,
-            filename: String,
-            altText: [{ type: String, required: true, maxlength: 300 }],
+            validator: function (images) {
+                return images.length <= 20;
+            },
+            message: 'You can upload a maximum of 20 images.'
         }
-    ],
+    },
     description: { type: String, required: true, maxlength: 1400 },
     prepHours: {
         type: Number, min: 0, validate: {
@@ -41,19 +50,22 @@ const RecipeSchema = new Schema({
                     min: 0,
                     set: function (value) {
                         return value === null || value === undefined || value === 0 || value === '' ? null : value;
-                    }
+                    },
+                    default: null
                 },
                 measurementUnit: {
                     type: String,
                     set: function (value) {
                         return value === 'null' ? null : value;
-                    }
+                    },
+                    default: null
                 },
                 measurementShorthand: {
                     type: String,
                     set: function (value) {
                         return value === 'null' ? null : value;
-                    }
+                    },
+                    default: null
                 },
                 ingredientName: { type: String, required: true }
             }

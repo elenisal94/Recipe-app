@@ -24,7 +24,9 @@ module.exports.recipeSchema = Joi.object({
         }
         return value;
     }),
-    altText: Joi.array().items(Joi.string().max(300)).required(),
+    altText: Joi.array().items(Joi.string().max(300)),
+    newAltText: Joi.array().items(Joi.string().max(300)),
+    deleteImages: Joi.array()
 })
 
 module.exports.reviewSchema = Joi.object({
