@@ -128,9 +128,9 @@
                     <div class="col-9 col-sm-6 col-md-4 col-xl-3">
                         <select class="form-select" name="preferredSystem" id="preferredSystem"
                             onchange="UpdateHiddenInput()">
-                            <option value="metric" <%=recipe.measurementSystem==='metric' ? 'selected' : '' %>>Metric
+                            <option value="metric" <%=user.measurementSystem==='metric' ? 'selected' : '' %>>Metric
                             </option>
-                            <option value="imperial" <%=recipe.measurementSystem==='imperial' ? 'selected' : '' %>
+                            <option value="imperial" <%=user.measurementSystem==='imperial' ? 'selected' : '' %>
                                 >Imperial</option>
                         </select>
                     </div>
@@ -654,7 +654,6 @@
             const ingredientsContainer = document.getElementById('ingredientsContainer')
             const stepsContainer = document.getElementById('stepsContainer')
             const recipeForm = document.getElementById('recipeForm');
-            console.log('event listener running');
             let formSubmitted = false;
             recipeForm.addEventListener('submit', function () { formSubmitted = true });
             let isErrorMessageDisplayed = false;
@@ -750,7 +749,6 @@
                         const invalidMessage = createMessage('invalidMessage', 'text-danger', `File "${file.name}" exceeds the maximum size of 1MB. Please choose another image or try compress your image at https://compressjpeg.com/ `);
                         imagesValidation.innerHTML = '';
                         imagesValidation.appendChild(invalidMessage);
-                        console.log('size too big')
                         valid = false;
                     }
 

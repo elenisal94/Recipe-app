@@ -47,7 +47,7 @@
                     <li class="list-group-item">For <%= recipe.serves %> people</li>
                     <li class="list-group-item"> Ingredients:
                         <ul>
-                            <%if(recipe.measurementSystem==='metric' ){recipe.ingredients.forEach(function(ingredient) {
+                            <%if(user.measurementSystem==='metric' ){recipe.ingredients.forEach(function(ingredient) {
                                 %>
                                 <li>
                                     <%= `${ingredient.amount !==null ? roundValue(ingredient.amount):''}

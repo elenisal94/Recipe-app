@@ -39,3 +39,22 @@ module.exports.logout = (req, res, next) => {
         res.redirect('/recipes');
     });
 }
+
+module.exports.renderSettings = (req, res) => {
+    const user = req.user;
+    res.render('users/settings', { user });
+}
+
+module.exports.updateSettings = async (req, res) => {
+    const userId = req.user._id;
+    console.log('user id', userId)
+    const { measurementSystem } = req.body;
+    try {
+        const updatedUser = await User.findByIdAndUpdate(userId, { measurementSystem }, { new: true });
+        req.flash('success', 'Settings updated successfully!');
+        res.redirect(`/settings/${userId}`);
+    } catch (error) {
+        req.flash('error', 'An error occurred while updating settings.');
+        res.redirect(`/settings/${userId}`);
+    }
+};

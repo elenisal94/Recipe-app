@@ -8,7 +8,8 @@ const UserSchema = new Schema({
         type: String,
         required: true,
         unique: true
-    }
+    },
+    measurementSystem: { type: String, required: true, default: 'metric' }
 });
 
 UserSchema.plugin(passportLocalMongoose);

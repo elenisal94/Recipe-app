@@ -58,3 +58,11 @@ module.exports.validateReview = (req, res, next) => {
         next();
     }
 }
+
+module.exports.isAuthorised = (req, res, next) => {
+    if (req.user && req.params.id === req.user._id.toString()) {
+        return next();
+    } else {
+        res.redirect('/login');
+    }
+}

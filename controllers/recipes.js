@@ -38,8 +38,8 @@ module.exports.createRecipe = async (req, res, next) => {
             const convertedIngredients = await Promise.all(conversionPromises);
             const recipe = new Recipe({ ...recipeData, ingredients: convertedIngredients });
             recipe.images = req.files.map((f, i) => ({ url: f.path, filename: f.filename, altText: req.body.altText[i] }));
-            console.log('Recipe before saving', recipe)
             await recipe.save();
+            await req.user.updateOne({ $set: { measurementSystem: selectedSystem } });
             req.flash('success', 'Successfully created a new recipe!');
             res.redirect(`/recipes/${recipe._id}`);
         } catch (error) {
@@ -55,6 +55,7 @@ module.exports.showRecipe = async (req, res) => {
         req.flash('error', 'Cannot find that recipe!')
         return res.redirect('/recipes');
     }
+    const user = req.user;
     function roundValue(value) {
         let roundedValue = value.toFixed(1);
         return parseFloat(roundedValue);
@@ -68,7 +69,7 @@ module.exports.showRecipe = async (req, res) => {
             ingredientName: ingredient.ingredientName,
         };
     }));
-    res.render('recipes/show', { recipe, convertedIngredients, roundValue });
+    res.render('recipes/show', { recipe, user, convertedIngredients, roundValue });
 }
 
 module.exports.renderEditForm = async (req, res) => {
@@ -77,6 +78,7 @@ module.exports.renderEditForm = async (req, res) => {
         req.flash('error', 'Cannot find that recipe!')
         return res.redirect('/recipes');
     }
+    const user = req.user;
     const ingredientsArray = recipe.ingredients;
     const convertedIngredients = await Promise.all(ingredientsArray.map(async (ingredient) => {
         const conversionResult = await convertToImperial(ingredient.amount, ingredient.measurementShorthand, recipe.measurementSystem);
@@ -86,7 +88,7 @@ module.exports.renderEditForm = async (req, res) => {
             ingredientName: ingredient.ingredientName,
         };
     }));
-    res.render('recipes/edit', { recipe, countryInfoData, metricShorthandData, imperialShorthandData, convertedIngredients })
+    res.render('recipes/edit', { recipe, user, countryInfoData, metricShorthandData, imperialShorthandData, convertedIngredients })
 }
 
 module.exports.updateRecipe = async (req, res) => {
@@ -124,6 +126,7 @@ module.exports.updateRecipe = async (req, res) => {
         recipe.images.push(...newImages);
 
         await recipe.save();
+        await req.user.updateOne({ $set: { measurementSystem: selectedSystem } });
 
         if (req.body.deleteImages) {
             await Promise.all(req.body.deleteImages.map(filename => cloudinary.uploader.destroy(filename)));
