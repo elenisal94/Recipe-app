@@ -128,7 +128,9 @@
                     <div class="col-9 col-sm-6 col-md-4 col-xl-3">
                         <select class="form-select" name="preferredSystem" id="preferredSystem"
                             onchange="UpdateHiddenInput()">
-                            <option value="metric" <%=user.measurementSystem==='metric' ? 'selected' : '' %>>Metric
+                            <option value="metric" <%=(user.measurementSystem==='metric' ||
+                                user.measurementSystem===null || user.measurementSystem===undefined) ? 'selected' : ''
+                                %>>Metric
                             </option>
                             <option value="imperial" <%=user.measurementSystem==='imperial' ? 'selected' : '' %>
                                 >Imperial</option>

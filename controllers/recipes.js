@@ -4,6 +4,9 @@ const { expandOrShortenUnit, metricShorthandData, imperialShorthandData } = requ
 const { convertToMetric, convertToImperial } = require('../utils/convertUnitAmount');
 const catchAsync = require('../helper/catchAsync');
 const { cloudinary } = require("../cloudinary");
+const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
+const mapBoxToken = process.env.MAPBOX_TOKEN;
+const geocoder = mbxGeocoding({ accessToken: mapBoxToken });
 
 module.exports.index = async (req, res) => {
     const recipes = await Recipe.find({});
@@ -22,6 +25,11 @@ module.exports.createRecipe = async (req, res, next) => {
     recipeData.countryFullname = countryData.countryFullname;
     recipeData.countryFlag = countryData.countryFlag;
 
+    const geoData = await geocoder.forwardGeocode({
+        query: recipeData.countryFullname,
+        limit: 1
+    }).send()
+
     const selectedSystem = recipeData.measurementSystem;
     const ingredientsArray = recipeData.ingredients ? recipeData.ingredients : [recipeData.ingredients];
 
@@ -37,6 +45,7 @@ module.exports.createRecipe = async (req, res, next) => {
         try {
             const convertedIngredients = await Promise.all(conversionPromises);
             const recipe = new Recipe({ ...recipeData, ingredients: convertedIngredients });
+            recipe.geometry = geoData.body.features[0].geometry;
             recipe.images = req.files.map((f, i) => ({ url: f.path, filename: f.filename, altText: req.body.altText[i] }));
             await recipe.save();
             await req.user.updateOne({ $set: { measurementSystem: selectedSystem } });
@@ -100,6 +109,10 @@ module.exports.updateRecipe = async (req, res) => {
     recipeData.countryFlag = countryData.countryFlag;
     const selectedSystem = recipeData.measurementSystem;
     const ingredientsArray = recipeData.ingredients ? recipeData.ingredients : [recipeData.ingredients];
+    const geoData = await geocoder.forwardGeocode({
+        query: recipeData.countryFullname,
+        limit: 1
+    }).send()
 
     if (Array.isArray(ingredientsArray)) {
         const convertedIngredients = await Promise.all(ingredientsArray.map(async (ingredient) => {
@@ -113,6 +126,7 @@ module.exports.updateRecipe = async (req, res) => {
         }));
 
         const recipe = await Recipe.findByIdAndUpdate(id, { ...recipeData, ingredients: convertedIngredients });
+        recipe.geometry = geoData.body.features[0].geometry;
 
         if (req.body.altText) {
             req.body.altText.forEach((altText, i) => {

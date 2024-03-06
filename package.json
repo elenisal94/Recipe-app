@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@mapbox/mapbox-sdk": "^0.15.3",
     "cloudinary": "^1.41.3",
     "connect-flash": "^0.1.1",
     "convert-units": "^2.3.4",
@@ -21,6 +22,8 @@
     "handy-uploader": "^1.1.8",
     "joi": "^17.12.1",
     "lorem-ipsum": "^2.0.8",
+    "mapbox-gl": "^3.2.0",
+    "mapboxgl-spiderifier": "^1.0.10",
     "method-override": "^3.0.0",
     "mongoose": "^8.1.1",
     "multer": "^1.4.5-lts.1",

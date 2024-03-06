@@ -8,6 +8,8 @@ const imageSchema = new mongoose.Schema({
     altText: { type: String, maxlength: 300 }
 });
 
+const opts = { toJSON: { virtuals: true } };
+
 const RecipeSchema = new Schema({
     title: { type: String, required: true, maxlength: 150 },
     images: {
@@ -41,6 +43,17 @@ const RecipeSchema = new Schema({
     countryCode: { type: String, required: true },
     countryFullname: { type: String, required: true },
     countryFlag: { type: String, required: true },
+    geometry: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            required: true
+        },
+        coordinates: {
+            type: [Number],
+            required: true
+        }
+    },
     measurementSystem: { type: String, required: true },
     ingredients: {
         type: [
@@ -86,7 +99,13 @@ const RecipeSchema = new Schema({
             ref: 'Review'
         }
     ]
-});
+}, opts);
+
+RecipeSchema.virtual('properties.popUpMarkup').get(function () {
+    return `<strong><a href="/recipes/${this._id}">${this.title}</a><strong>
+    <p>${this.description.substring(0, 30)}...</p>`
+})
+
 
 RecipeSchema.pre('save', function (next) {
     if (this.prepHours === '' || this.prepHours === 0) {

@@ -85,6 +85,13 @@ const seedDB = async () => {
             countryFullname: countryInfo.countryFullname,
             countryFlag: countryInfo.countryFlag,
             measurementSystem: 'metric',
+            geometry: {
+                type: 'Point',
+                coordinates: [
+                    -0.136439,
+                    51.507359
+                ]
+            },
             ingredients,
             method
         });
