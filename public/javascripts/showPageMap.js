@@ -6,6 +6,8 @@ const map = new mapboxgl.Map({
     zoom: 5,
 });
 
+map.addControl(new mapboxgl.NavigationControl());
+
 const markerElement = document.createElement('div');
 markerElement.className = 'custom-marker';
 markerElement.style.width = '20px';

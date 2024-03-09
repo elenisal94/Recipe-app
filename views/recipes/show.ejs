@@ -3,12 +3,11 @@
 
     <div class="row">
         <div class="col-12 col-xl-6">
-            <div id='map' style='width: 400px; height: 300px;'></div>
-            <div id="recipeCarousel" class="carousel slide carousel-fade">
-                <div class="carousel-inner">
+            <div id="recipeCarousel" class="carousel slide carousel-fade" data-bs-theme="dark">
+                <div class="carousel-inner bg-secondary p-2 text-dark bg-opacity-25">
                     <% recipe.images.forEach((img, i)=> { %>
                         <div class="carousel-item <%= i===0 ? 'active' : '' %>">
-                            <img src="<%= img.url %>" class="d-block w-100" alt="<%= img.altText%>">
+                            <img src="<%= img.url %>" class="center-block carousel-image" alt="<%= img.altText%>">
                         </div>
                         <% }) %>
                 </div>
@@ -48,7 +47,7 @@
                     <li class="list-group-item">For <%= recipe.serves %> people</li>
                     <li class="list-group-item"> Ingredients:
                         <ul>
-                            <%if(user && (user.measurementSystem === 'metric' || user.measurementSystem === null || user.measurementSystem === undefined)){recipe.ingredients.forEach(function(ingredient) {
+                            <%if(!currentUser || user.measurementSystem === 'metric'){recipe.ingredients.forEach(function(ingredient) {
                                 %>
                                 <li>
                                     <%= `${ingredient.amount !==null ? roundValue(ingredient.amount):''}
@@ -95,13 +94,13 @@
             </div>
         </div>
         <div class="col-12 col-xl-6 mt-4">
+        <div id="map" class="mb-4"></div>
             <% if(currentUser) {%>
-                <h2>Rate this recipe</h2>
+                <h4>Rate this recipe</h4>
                 <form id="reviewForm" action="/recipes/<%=recipe._id%>/reviews" method="POST"
                     class="mb-3 validated-form" novalidate>
-                    <div class="mb-3">
+                    <div>
                         <fieldset id="starsRating" class="starability-growRotate">
-                            <legend>Rating:</legend>
                             <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="0"
                                 checked aria-label="No rating." />
                             <input type="radio" id="first-rate1" name="review[rating]" value="1" />
@@ -118,8 +117,8 @@
                         <div id="starsValidation"></div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="body">Review</label>
-                        <textarea class="form-control" name="review[body]" id="" cols="30" rows="3" required></textarea>
+                        <label class="form-label" for="body">Leave a review</label>
+                        <textarea class="form-control" name="review[body]" id="" cols="30" rows="3" placeholder="What a crepe!..." required></textarea>
                         <div class="valid-feedback">
                             Looks good!
                         </div>
@@ -129,13 +128,20 @@
                     </div>
                     <button class="btn btn-success">Submit</button>
                 </form>
-                <% } %>
-                    <% for (let review of recipe.reviews){ %>
+                <% } else {%>
+                <div>
+                <p>To rate this recipe <a href="/login">login</a> or <a href="/signup">signup</a></p>
+                </div>
+
+                <%}%>
+                <div><h3>Reviews</h3></div>
+                <% if (recipe.reviews.length > 0) { %>
+                    <% recipe.reviews.reverse().forEach(review => { %>
                         <div class="mb-3 card">
                             <div class=" card-body">
                                 <p class="starability-result" data-rating="<%=review.rating%>">Rated: <%= review.rating
                                         %> stars</p>
-                                <p class="card-text"> Review: <%= review.body %>
+                                <p class="card-text"> <%= review.body %>
                                 </p>
                                 <h6 class="card-subtitle mb-2 text-muted">By: <%= review.author.username %>
                                 </h6>
@@ -147,14 +153,13 @@
                                     <% } %>
                             </div>
                         </div>
-                        <% } %>
+                        <% }) %>
+                        <% } else { %>
+                        <p class="text-muted">Oups, it looks like this recipe doesn't have any reviews yet...</p>
+                    <% } %>
         </div>
     </div>
     </div>
-
-    <footer>
-        <a href="/recipes">All Recipes</a>
-    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

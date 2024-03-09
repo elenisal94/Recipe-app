@@ -91,7 +91,7 @@ screen and (min-resolution: 192dpi) {
     display: block;
     position: relative;
     width: 150px;
-    min-height: 60px;
+    min-height: 40px;
     padding: 0;
     border: none;
     will-change: contents;

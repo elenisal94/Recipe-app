@@ -1,17 +1,16 @@
 <% layout ('layouts/boilerplate') %>
-    <div id="map" style="width: 100%; height: 500px"></div>
+    <div id="cluster-map" class="mb-3"></div>
+    <div class="mt-2 mb-3">
     <h1>All Recipes</h1>
-    <div>
-        <a href="/recipes/new">Add Recipe</a>
     </div>
     <% for (let recipe of recipes){%>
-        <div class="card" mb-3>
+        <div class="card mb-3">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-4 index-card-column">
                     <% if(recipe.images.length) {%>
-                    <img class="img-fluid" alt="" src="<%=recipe.images[0].url%>">
+                    <img class="index-img" alt="" src="<%=recipe.images[0].url%>">
                     <% }else{ %>
-                    <img class="img-fluid" alt="" src="https://res.cloudinary.com/dr35pjw8f/image/upload/v1709747988/ElenisRecipeParadise/chad-montano-gf9777gaYjs-unsplash_hx0wpc.jpg"
+                    <img class="index-img" alt="" src="https://res.cloudinary.com/dr35pjw8f/image/upload/v1709747988/ElenisRecipeParadise/chad-montano-gf9777gaYjs-unsplash_hx0wpc.jpg"
                     <% } %>
                 </div>
                 <div class="col-md-8">

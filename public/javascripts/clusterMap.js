@@ -2,11 +2,13 @@ mapboxgl.accessToken = mapToken;
 let features = recipes.features;
 
 const map = new mapboxgl.Map({
-    container: 'map',
+    container: 'cluster-map',
     style: 'mapbox://styles/mapbox/light-v11',
     center: [9.188540, 45.464664],
     zoom: 3
 });
+
+map.addControl(new mapboxgl.NavigationControl());
 
 const spiderifier = new MapboxglSpiderifier(map, {
     customPin: true,

@@ -1,2 +1,59 @@
-<% layout('layouts/boilerplate')%>
-    <h1>Home! Recipe app!</h1>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe paradise</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/stylesheets/home.css">
+</head>
+
+<body class="d-flex flex-column vh-100">
+    <nav class="navbar sticky-top navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Recipe Paradise</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="/">Home</a>
+                    <a class="nav-link" href="/recipes">Recipes</a>
+                    <a class="nav-link" href="/recipes/new">New Recipe</a>
+                </div>
+                <div class="navbar-nav ms-auto">
+                    <% if(!currentUser){ %>
+                        <a class="nav-link" href="/login">Login</a>
+                        <a class="nav-link" href="/signup">Signup</a>
+                        <% } else {%>
+                            <a class="nav-link" href="/settings/<%=currentUser._id%>">Settings</a>
+                            <a class="nav-link" href="/logout">Logout</a>
+                            <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="mt-5 h-75 d-flex justify-content-center align-items-center">
+        <div class="col-10 col-md-6 text-black text-center bg-body-tertiary cover-container p-4">
+            <h1>Welcome to Eleni's Recipe Paradise!</h1>
+            <p class="lead"> Ever wonder what Eleni's friends are
+                munching
+                on halfway across the globe? Well, wonder no more! Sneak a peek into their kitchens, rate their
+                creations, and maybe even pick up a few secrets for your own culinary escapades. <br>
+                Because let's face it, if Eleni can't be at every table, you better believe she's going to find out
+                what's cooking by creating her own website!
+            </p>
+            <a href="/recipes" class="btn btn-lg btn-primary font-weight-bold border-white bg-primary">View
+                Recipes</a>
+        </div>
+    </main>
+
+    <footer class="mt-auto offset-1">
+        <div class="text-white"> &copy; Eleni's Recipe Paradise</div>
+    </footer>
+</body>
+
+</html>
