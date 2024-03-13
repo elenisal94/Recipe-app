@@ -12,6 +12,8 @@ map.addControl(new mapboxgl.NavigationControl());
 
 const spiderifier = new MapboxglSpiderifier(map, {
     customPin: true,
+    circleSpiralSwitchover: Infinity,
+    circleFootSeparation: 45,
     initializeLeg: function (spiderLeg) {
         const $spiderPinCustom = document.createElement('div');
         $spiderPinCustom.className = 'spider-point-circle';
@@ -30,7 +32,6 @@ const spiderifier = new MapboxglSpiderifier(map, {
             offset: MapboxglSpiderifier.popupOffsetForSpiderLeg(spiderLeg)
         });
         const popUpMarkup = spiderLeg.feature['popUpMarkup'];
-        console.log('popUpMarkup:', popUpMarkup);
         popup.setHTML(popUpMarkup);
         spiderLeg.mapboxMarker.setPopup(popup);
 
@@ -44,6 +45,19 @@ const spiderifier = new MapboxglSpiderifier(map, {
 
         map.on('click', function () {
             popup.remove();
+        });
+
+        document.addEventListener('click', function (event) {
+            const container = spiderLeg.elements.container;
+
+            if (!container.contains(event.target)) {
+                container.remove();
+                popup.remove();
+            }
+        });
+
+        spiderLeg.elements.container.addEventListener('click', function (event) {
+            event.stopPropagation();
         });
     }
 });
@@ -147,7 +161,6 @@ function mouseClick(e) {
                 }
 
                 const markers = leafFeatures.map(leafFeature => leafFeature.properties);
-                console.log('Leaf features of cluster:', markers);
                 spiderifier.spiderfy(features[0].geometry.coordinates, markers);
             }
         );
@@ -170,4 +183,3 @@ function mouseClick(e) {
         });
     }
 }
-

@@ -117,8 +117,8 @@
                         <div id="starsValidation"></div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="body">Leave a review</label>
-                        <textarea class="form-control" name="review[body]" id="" cols="30" rows="3" placeholder="What a crepe!..." required></textarea>
+                        <label class="form-label" for="review">Leave a review</label>
+                        <textarea class="form-control" name="review[body]" id="review" cols="30" rows="3" placeholder="What a crepe!..." required></textarea>
                         <div class="valid-feedback">
                             Looks good!
                         </div>
@@ -155,7 +155,7 @@
                         </div>
                         <% }) %>
                         <% } else { %>
-                        <p class="text-muted">Oups, it looks like this recipe doesn't have any reviews yet...</p>
+                        <p class="text-muted">Oops, it looks like this recipe doesn't have any reviews yet...</p>
                     <% } %>
         </div>
     </div>

@@ -13,7 +13,7 @@ const metricShorthandData = {
 };
 const imperialShorthandData = {
     null: { measurementShorthand: null },
-    "gallons": { measurementShorthand: "gal" },
+    // "gallons": { measurementShorthand: "gal" },
     "ounces": { measurementShorthand: "oz" },
     "teaspoons": { measurementShorthand: "tsp" },
     "tablespoons": { measurementShorthand: "Tbs" },

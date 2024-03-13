@@ -11,7 +11,7 @@
                         <label class="form-label" for="title">Recipe name:</label>
                         <div class="col-12 col-sm-10 col-md-5 col-xl-4">
                             <input class="form-control" type="text" id="title" name="recipe[title]"
-                                placeholder="e.g. Divine turkey steak" value="<%=recipe.title%>" required>
+                                placeholder="e.g. Eleni's gourmet carrot soup" value="<%=recipe.title%>" required>
                             <div class="valid-feedback">
                                 Looks good!
                             </div>
@@ -25,7 +25,7 @@
                             max.):</label>
                         <div><textarea class="form-control" id="description" name="recipe[description]" rows="5"
                                 cols="50" maxlength="1300" required
-                                placeholder="e.g. Savor the delicious combination of expertly seasoned pan-seared turkey steaks paired with al dente garlic Parmesan pasta. This quick and flavorful recipe is a perfect choice for a delightful and satisfying dinner."><%= recipe.description %></textarea>
+                                placeholder="e.g. Eleni's gourmet carrot soup is a comforting blend of fresh carrots, onions, and a hint of spice, simmered to perfection for a hearty and satisfying meal that's sure to warm you up on chilly days."><%= recipe.description %></textarea>
                             <div class="valid-feedback">
                                 Looks good!
                             </div>
@@ -143,18 +143,18 @@
                             potatoes, 3 apples, salt.
                             Please <b>do not</b> use fractions like '2/3 cups of flour'.</p>
                     </div>
-                    <div id="ingredientsContainer" class="row mb-3 list-group">
+                    <div id="ingredientsContainer" class="row list-group">
                         <!-- Ingredient input fields will be dynamically added here -->
                     </div>
-                    <div id="ingredientsValidation">
-                        <!-- Ingredients Validation messages will be displayed here -->
+                    <div id="emptyIngredientsMessage">
+                        <!-- Empty ingredients message will be displayed here -->
                     </div>
                     <div id="metricIngredients"
                         data-metric-recipe-ingredients="<%= JSON.stringify(recipe.ingredients) %>">
                     </div>
                     <div id="imperialIngredients"
                         data-imperial-recipe-ingredients="<%= JSON.stringify(convertedIngredients) %>"></div>
-                    <button type="button" class="btn btn-primary" onclick="addIngredient();">Add
+                    <button type="button" class="btn btn-primary mt-2" onclick="addIngredient();">Add
                         Ingredient</button>
                 </div>
                 <div class="mb-4 pb-4">
@@ -165,10 +165,10 @@
                     <div id="stepsContainer">
                         <!-- Steps input fields will be dynamically added here -->
                     </div>
-                    <div id="recipeMethod" data-recipe-method="<%= JSON.stringify(recipe.method) %>"></div>
-                    <div id="methodValidation" class="">
-                        <!-- Method Validation messages will be displayed here -->
+                    <div id="missingMethodMessage">
+                        <!-- Method Method message will be displayed here -->
                     </div>
+                    <div id="recipeMethod" data-recipe-method="<%= JSON.stringify(recipe.method) %>"></div>
                     <button type="button" class="btn btn-primary" onclick="addStep()">Add Step</button>
                 </div>
 
@@ -396,24 +396,24 @@
             const ingredientInputs = document.createElement('div');
             const preferredSystem = document.getElementById('preferredSystem');
             const metricUnits = [{ value: null, text: '-' },
-            { value: "l", text: "liters" },
-            { value: "g", text: "grams", },
-            { value: "ml", text: "milliliters" },
-            { value: "kg", text: "kilograms" },
             { value: "tsp", text: "teaspoons" },
             { value: "Tbs", text: "tablespoons" },
             { value: "cup", text: "cups" },
             { value: "mg", text: "milligrams" },
+            { value: "ml", text: "milliliters" },
+            { value: "l", text: "liters" },
+            { value: "g", text: "grams" },
+            { value: "kg", text: "kilograms" },
             ];
             const imperialUnits = [{ value: null, text: '-' },
-            { value: "gal", text: "gallons" },
-            { value: "oz", text: "ounces" },
+            // { value: "gal", text: "gallons" },
             { value: "tsp", text: "teaspoons" },
             { value: "Tbs", text: "tablespoons" },
             { value: "cup", text: "cups" },
-            { value: "qt", text: "quarts" },
             { value: "fl-oz", text: "fluid ounces" },
+            { value: "oz", text: "ounces" },
             { value: "lb", text: "pounds" },
+            { value: "qt", text: "quarts" }
             ];
 
             ingredientInputs.innerHTML = `
@@ -603,30 +603,56 @@
             }
         }
 
-        function validateIngredients() {
+        function isEmptyIngredients() {
             const ingredientsContainer = document.getElementById('ingredientsContainer')
-            const ingredientsValidation = document.getElementById('ingredientsValidation');
+            const emptyIngredientsMessage = document.getElementById('emptyIngredientsMessage');
             if (ingredientsContainer.childElementCount === 0) {
                 const invalidMessage = createMessage('invalidMessage', 'text-danger', 'Please add at least one ingredient to your recipe');
-                ingredientsValidation.innerHTML = '';
-                ingredientsValidation.appendChild(invalidMessage);
+                emptyIngredientsMessage.innerHTML = '';
+                emptyIngredientsMessage.appendChild(invalidMessage);
                 return false;
             } else {
-                ingredientsValidation.innerHTML = '';
+                emptyIngredientsMessage.innerHTML = '';
                 return true;
             }
         }
 
-        function validateMethod() {
-            const stepsContainer = document.getElementById('stepsContainer')
-            const methodValidation = document.getElementById('methodValidation');
-            if (stepsContainer.childElementCount === 0) {
-                const invalidMessage = createMessage('invalidMessage', 'text-danger', 'Please add at least one step to your recipe method');
-                methodValidation.innerHTML = '';
-                methodValidation.appendChild(invalidMessage);
+        function validateUnitsWithoutAmount() {
+            const ingredients = document.querySelectorAll('.ingredient');
+            const missingAmountContainer = document.getElementById('missingAmountMessage');
+
+            let invalidIngredientFound = false;
+            ingredients.forEach(function (ingredient) {
+                const unit = ingredient.querySelector('.form-select').value;
+                const amount = ingredient.querySelector('.form-control[type="number"]')
+
+                if (unit !== 'null' && !amount.value) {
+                    invalidIngredientFound = true;
+                    amount.required = true;
+                }
+            });
+
+            if (invalidIngredientFound) {
                 return false;
             } else {
-                methodValidation.innerHTML = '';
+                const allAmountFields = document.querySelectorAll('.form-control[type="number"]');
+                allAmountFields.forEach(function (amountField) {
+                    amountField.required = false;
+                });
+                return true;
+            }
+        }
+
+        function isEmptyMethod() {
+            const stepsContainer = document.getElementById('stepsContainer')
+            const missingMethodContainer = document.getElementById('missingMethodMessage');
+            if (stepsContainer.childElementCount === 0) {
+                const invalidMessage = createMessage('invalidMessage', 'text-danger', 'Please add at least one step to your recipe method');
+                missingMethodContainer.innerHTML = '';
+                missingMethodContainer.appendChild(invalidMessage);
+                return false;
+            } else {
+                missingMethodContainer.innerHTML = '';
                 return true;
             }
         }
@@ -651,6 +677,7 @@
 
 
         document.addEventListener('DOMContentLoaded', function () {
+            const ingredients = document.querySelectorAll('.ingredient')
             const prepHours = document.getElementById('prepHours');
             const prepMinutes = document.getElementById('prepMinutes');
             const ingredientsContainer = document.getElementById('ingredientsContainer')
@@ -662,15 +689,16 @@
 
             function validateAndPreventSubmission(event) {
                 validatePreparationTime();
-                validateIngredients();
-                validateMethod();
+                isEmptyIngredients();
+                validateUnitsWithoutAmount();
+                isEmptyMethod();
                 checkRequiredFields(recipeForm);
-                if ((!validatePreparationTime()) || (!validateIngredients()) || (!validateMethod()) || (!checkRequiredFields(recipeForm))) {
+                if ((!validatePreparationTime()) || (!isEmptyIngredients()) || (!isEmptyMethod()) || (!checkRequiredFields(recipeForm)) || (!validateUnitsWithoutAmount())) {
                     event.preventDefault();
                     if (!isErrorMessageDisplayed) {
                         isErrorMessageDisplayed = true;
                         const formMessageContainer = document.getElementById('formMessage');
-                        const errorMessage = createMessage('invalidMessage', 'text-danger', 'Oups! Looks like something is missing, please have a look above ❤️‍🩹');
+                        const errorMessage = createMessage('invalidMessage', 'text-danger', 'Oops! Looks like something is missing, please have a look above ❤️‍🩹');
                         errorMessage.className = 'fade-out-message text-center';
                         formMessageContainer.appendChild(errorMessage);
                         void errorMessage.offsetWidth;
@@ -697,19 +725,49 @@
                 }
             });
 
-            const observer = new MutationObserver(function (mutationsList, observer) {
+            // Empty list mutation observer
+
+            const emptyListsObserver = new MutationObserver(function (mutationsList, observer) {
                 for (const mutation of mutationsList) {
                     if (mutation.type === 'childList' && formSubmitted) {
-                        validateIngredients();
-                        validateMethod();
+                        isEmptyIngredients();
+                        isEmptyMethod();
                     }
                 }
             });
 
             const observerConfig = { childList: true };
 
-            observer.observe(ingredientsContainer, observerConfig);
-            observer.observe(stepsContainer, observerConfig);
+            emptyListsObserver.observe(ingredientsContainer, observerConfig);
+            emptyListsObserver.observe(stepsContainer, observerConfig);
+
+            // Unit amount mutation observer
+
+            function handleMutation(mutationsList, observer) {
+                for (const mutation of mutationsList) {
+                    if (mutation.type === 'childList') {
+                        mutation.addedNodes.forEach(node => {
+                            node.addEventListener('change', function () {
+                                if (formSubmitted) {
+                                    validateUnitsWithoutAmount();
+                                }
+                            });
+                        });
+                    }
+                }
+            }
+
+
+            const config = {
+                childList: true,
+                attributes: true,
+                attributeOldValue: true,
+                attributeFilter: ['value'],
+                subtree: true,
+            };
+
+            const observer = new MutationObserver(handleMutation);
+            observer.observe(ingredientsContainer, config);
 
             recipeForm.addEventListener('submit', function (event) {
                 validateAndPreventSubmission(event);

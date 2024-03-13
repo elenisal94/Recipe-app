@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 const Review = require('./review');
 const Schema = mongoose.Schema;
 
+function validateAmount(value) {
+    if (this.measurementUnit && !value) {
+        return false;
+    }
+    return true;
+}
+
 const imageSchema = new mongoose.Schema({
     url: String,
     filename: String,
@@ -64,7 +71,8 @@ const RecipeSchema = new Schema({
                     set: function (value) {
                         return value === null || value === undefined || value === 0 || value === '' ? null : value;
                     },
-                    default: null
+                    default: null,
+                    validate: [validateAmount, 'Amount is required when unit is provided'],
                 },
                 measurementUnit: {
                     type: String,
@@ -103,7 +111,7 @@ const RecipeSchema = new Schema({
 
 RecipeSchema.virtual('properties.popUpMarkup').get(function () {
     return `<strong><a href="/recipes/${this._id}">${this.title}</a><strong>
-    <p>${this.description.substring(0, 30)}...</p>`
+    <p style="color: grey;">${this.countryFullname} ${this.countryFlag}</p>`
 })
 
 
