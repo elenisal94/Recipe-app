@@ -1,7 +1,6 @@
 const convert = require('convert-units');
 
 const imperialToMetricConversion = {
-    // gal: { target: 'l' },
     oz: { target: 'g' },
     tsp: { target: 'tsp' },
     Tbs: { target: 'Tbs' },
@@ -53,13 +52,6 @@ function convertToImperial(unitAmount, unitSelect, measurementSystem) {
     if (unitSelect === 'null') {
         return { convertedAmount: unitAmount, targetUnit: null }
     }
-    // if (unitSelect === 'l') {
-    //     const gallons = convert(unitAmount).from(unitSelect).to('gal');
-    //     const quarts = convert(unitAmount).from(unitSelect).to('qt');
-    //     const targetUnit = gallons >= 1 ? 'gal' : 'qt';
-    //     const convertedAmount = convert(unitAmount).from(unitSelect).to(targetUnit);
-    //     return { convertedAmount, targetUnit };
-    // }
     if (metricToImperialConversion.hasOwnProperty(unitSelect)) {
         const targetUnit = metricToImperialConversion[unitSelect].target;
         const convertedAmount = convert(unitAmount).from(unitSelect).to(targetUnit);

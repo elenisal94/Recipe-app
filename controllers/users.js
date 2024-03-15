@@ -47,10 +47,9 @@ module.exports.renderSettings = (req, res) => {
 
 module.exports.updateSettings = async (req, res) => {
     const userId = req.user._id;
-    console.log('user id', userId)
     const { measurementSystem } = req.body;
     try {
-        const updatedUser = await User.findByIdAndUpdate(userId, { measurementSystem }, { new: true });
+        await User.findByIdAndUpdate(userId, { measurementSystem }, { new: true });
         req.flash('success', 'Settings updated successfully!');
         res.redirect(`/settings/${userId}`);
     } catch (error) {

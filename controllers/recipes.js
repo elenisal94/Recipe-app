@@ -2,7 +2,6 @@ const Recipe = require('../models/recipe');
 const { getCountryInfo, countryInfoData } = require('../utils/countryInfo');
 const { expandOrShortenUnit, metricShorthandData, imperialShorthandData } = require('../utils/shorthand');
 const { convertToMetric, convertToImperial } = require('../utils/convertUnitAmount');
-const catchAsync = require('../helper/catchAsync');
 const { cloudinary } = require("../cloudinary");
 const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
 const mapBoxToken = process.env.MAPBOX_TOKEN;
@@ -18,68 +17,67 @@ module.exports.renderNewForm = (req, res) => {
 }
 
 module.exports.createRecipe = async (req, res, next) => {
-    const recipeData = req.body.recipe;
-    recipeData.author = req.user._id;
-    const selectedCountryCode = recipeData.countryCode;
-    const countryData = getCountryInfo(selectedCountryCode);
-    recipeData.countryFullname = countryData.countryFullname;
-    recipeData.countryFlag = countryData.countryFlag;
+    try {
+        const recipeData = { ...req.body.recipe, author: req.user._id };
+        const { countryCode, measurementSystem, ingredients } = recipeData;
+        const { countryFullname, countryFlag } = getCountryInfo(countryCode);
 
-    const geoData = await geocoder.forwardGeocode({
-        query: recipeData.countryFullname,
-        limit: 1
-    }).send()
+        const geoData = await geocoder.forwardGeocode({
+            query: countryFullname,
+            limit: 1
+        }).send();
 
-    const selectedSystem = recipeData.measurementSystem;
-    const ingredientsArray = recipeData.ingredients ? recipeData.ingredients : [recipeData.ingredients];
-
-    if (Array.isArray(ingredientsArray)) {
+        const ingredientsArray = Array.isArray(ingredients) ? ingredients : [ingredients];
         const conversionPromises = ingredientsArray.map(async (ingredient) => {
-            const conversionResult = await convertToMetric(ingredient.amount, ingredient.measurementShorthand, selectedSystem);
-            ingredient.amount = conversionResult.convertedAmount;
-            ingredient.measurementShorthand = conversionResult.targetUnit;
-            ingredient.measurementUnit = expandOrShortenUnit(ingredient.measurementShorthand, selectedSystem);
-            return ingredient;
+            const { convertedAmount, targetUnit } = await convertToMetric(ingredient.amount, ingredient.measurementShorthand, measurementSystem);
+            return { ...ingredient, amount: convertedAmount, measurementShorthand: targetUnit, measurementUnit: expandOrShortenUnit(targetUnit, measurementSystem) };
         });
 
-        try {
-            const convertedIngredients = await Promise.all(conversionPromises);
-            const recipe = new Recipe({ ...recipeData, ingredients: convertedIngredients });
-            recipe.geometry = geoData.body.features[0].geometry;
-            recipe.images = req.files.map((f, i) => ({ url: f.path, filename: f.filename, altText: req.body.altText[i] }));
-            await recipe.save();
-            await req.user.updateOne({ $set: { measurementSystem: selectedSystem } });
-            req.flash('success', 'Successfully created a new recipe!');
-            res.redirect(`/recipes/${recipe._id}`);
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Internal Server Error');
-        }
+        const convertedIngredients = await Promise.all(conversionPromises);
+        const recipe = new Recipe({ ...recipeData, countryFullname, countryFlag, ingredients: convertedIngredients, geometry: geoData.body.features[0].geometry });
+
+        recipe.images = req.files.map((f, i) => ({ url: f.path, filename: f.filename, altText: req.body.altText[i] }));
+        await recipe.save();
+        await req.user.updateOne({ $set: { measurementSystem } });
+
+        req.flash('success', 'Successfully created a new recipe!');
+        res.redirect(`/recipes/${recipe._id}`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
-}
+};
 
 module.exports.showRecipe = async (req, res) => {
-    const recipe = await Recipe.findById(req.params.id).populate({ path: 'reviews', populate: { path: 'author' } }).populate('author');
-    if (!recipe) {
-        req.flash('error', 'Cannot find that recipe!')
-        return res.redirect('/recipes');
+    try {
+        const recipe = await Recipe.findById(req.params.id)
+            .populate({ path: 'reviews', populate: { path: 'author' } })
+            .populate('author');
+
+        if (!recipe) {
+            req.flash('error', 'Cannot find that recipe!')
+            return res.redirect('/recipes');
+        }
+
+        const user = req.user;
+
+        const roundValue = (value) => parseFloat(value.toFixed(1));
+
+        const convertedIngredients = await Promise.all(recipe.ingredients.map(async (ingredient) => {
+            const conversionResult = await convertToImperial(ingredient.amount, ingredient.measurementShorthand, recipe.measurementSystem);
+            return {
+                amount: conversionResult.convertedAmount,
+                measurementShorthand: conversionResult.targetUnit,
+                ingredientName: ingredient.ingredientName,
+            };
+        }));
+
+        res.render('recipes/show', { recipe, user, convertedIngredients, roundValue });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
-    const user = req.user;
-    function roundValue(value) {
-        let roundedValue = value.toFixed(1);
-        return parseFloat(roundedValue);
-    };
-    const ingredientsArray = recipe.ingredients;
-    const convertedIngredients = await Promise.all(ingredientsArray.map(async (ingredient) => {
-        const conversionResult = convertToImperial(ingredient.amount, ingredient.measurementShorthand, recipe.measurementSystem);
-        return {
-            amount: conversionResult.convertedAmount,
-            measurementShorthand: conversionResult.targetUnit,
-            ingredientName: ingredient.ingredientName,
-        };
-    }));
-    res.render('recipes/show', { recipe, user, convertedIngredients, roundValue });
-}
+};
 
 module.exports.renderEditForm = async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
@@ -151,7 +149,6 @@ module.exports.updateRecipe = async (req, res) => {
     req.flash('success', 'Successfully updated recipe');
     res.redirect(`/recipes/${id}`);
 }
-
 
 module.exports.deleteRecipe = async (req, res) => {
     const { id } = req.params;

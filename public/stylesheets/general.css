@@ -27,7 +27,6 @@
 
 a {
     color: #E91E63;
-    /* Adjust the color value as needed */
 }
 
 
@@ -41,4 +40,20 @@ a {
     object-fit: cover;
     width: 100%;
 
+}
+
+.previewImage {
+    max-width: 200px;
+    max-height: 300px;
+}
+
+.fade-out-message {
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+    color: red;
+    font-weight: bold;
+}
+
+.fade-out-message.fade-out {
+    opacity: 0;
 }

@@ -1,12 +1,10 @@
 const Recipe = require('../models/recipe');
 const Review = require('../models/review');
-const catchAsync = require('../helper/catchAsync');
 
 module.exports.createReview = async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
     const review = new Review(req.body.review);
     review.author = req.user._id;
-    console.log('Review before saving:', review.author.username);
     recipe.reviews.push(review);
     await review.save();
     await recipe.save();
