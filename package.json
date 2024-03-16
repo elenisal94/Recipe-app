@@ -18,8 +18,10 @@
     "ejs": "^3.1.9",
     "ejs-mate": "^4.0.0",
     "express": "^4.18.2",
+    "express-mongo-sanitize": "^2.2.0",
     "express-session": "^1.18.0",
     "handy-uploader": "^1.1.8",
+    "helmet": "^7.1.0",
     "joi": "^17.12.1",
     "lorem-ipsum": "^2.0.8",
     "mapbox-gl": "^3.2.0",
@@ -31,6 +33,7 @@
     "passport": "^0.7.0",
     "passport-local-mongoose": "^8.0.0",
     "punycode": "^2.3.1",
+    "sanitize-html": "^2.12.1",
     "vue": "^2.7.16"
   }
 }
