@@ -1,7 +1,6 @@
-// if (process.env.NODE_ENV !== "production") {
-//     require('dotenv').config();
-// }
-require('dotenv').config();
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
 
 const express = require('express');
 const path = require('path');
@@ -22,7 +21,11 @@ const userRoutes = require('./routes/users');
 const recipeRoutes = require('./routes/recipes');
 const reviewRoutes = require('./routes/reviews');
 
-mongoose.connect('mongodb://localhost:27017/recipe-app');
+const MongoDBStore = require("connect-mongo")(session);
+
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/recipe-app';
+
+mongoose.connect(dbUrl);
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -43,9 +46,23 @@ app.use(
         replaceWith: '_',
     }),
 );
+
+const secret = process.env.SECRET || 'somethingsecret'
+
+const store = new MongoDBStore({
+    url: dbUrl,
+    secret,
+    touchAfter: 24 * 60 * 60
+});
+
+store.on("error", function (e) {
+    console.log("Store Error", e)
+})
+
 const sessionConfig = {
+    store,
     name: 'session',
-    secret: 'somethingsecret',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -114,7 +131,6 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
-    console.log(req.query);
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
