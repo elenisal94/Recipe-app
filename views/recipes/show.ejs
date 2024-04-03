@@ -44,7 +44,7 @@
                         <%= `Time needed: ${recipe.prepHours ? recipe.prepHours + (recipe.prepHours===1 ? " hour"
                             : " hours" ) : "" } ${recipe.prepMinutes ? recipe.prepMinutes + " minutes" : "" }` %>
                     </li>
-                    <li class="list-group-item">For <%= recipe.serves %> people</li>
+                    <li class="list-group-item">For <%= recipe.serves %> <%= recipe.serves === 1 ? 'person' : 'people' %></li>
                     <li class="list-group-item"> Ingredients:
                         <ul>
                             <%if(!currentUser || user.measurementSystem === 'metric'){recipe.ingredients.forEach(function(ingredient) {
