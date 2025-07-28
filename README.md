@@ -91,8 +91,8 @@ Render • Git • npm
 
 ```
 Recipe-app/
-├── cloudinary/       # Image upload configuration
-├── controllers/      # Business logic and CRUD operations
+├── cloudinary/      # Image upload configuration
+├── controllers/     # Business logic and CRUD operations
 ├── helper/          # Utility functions and helpers
 ├── models/          # MongoDB schemas and data models
 ├── public/          # Static assets (CSS, JavaScript, images)
@@ -116,7 +116,7 @@ Implemented real-time unit conversion using the `convert-units` library. All dat
 Built custom middleware for user authentication and authorisation, ensuring users can view all recipes but only edit their own. Session management handles user state across the application.
 
 ### Image Management
-Integrated Cloudinary for efficient image upload, storage, and optimisation. Users can upload recipe photos that are automatically processed and served via CDN.
+Integrated Cloudinary for efficient image upload, storage, and optimisation. Users can upload recipe photos with automatic image optimisation for fast loading.
 
 ## 📊 Results & Impact
 
