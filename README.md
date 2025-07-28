@@ -117,10 +117,10 @@ Recipe-app/
 **Authentication & Security:**
 - Passport.js & Passport-Local-Mongoose - User authentication
 - Helmet - Security middleware
-- Express-Mongo-Sanitize - Input sanitization
+- Express-Mongo-Sanitize - Input sanitisation
 
 **File Upload & Storage:**
-- Cloudinary - Image upload and optimization
+- Cloudinary - Image upload and optimisation
 - Multer - File upload handling
 
 **Maps & Location:**
