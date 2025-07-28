@@ -1,8 +1,8 @@
 # Eleni's Recipe Paradise 🥘
 
-A recipe sharing platform for friends around the world to share their favorite dishes, discover new recipes, and rate each other's culinary creations.
+A recipe sharing platform for friends around the world to share their favourite dishes, discover new recipes, and rate each other's culinary creations.
 
-**Live Demo:** [https://eleni-recipe-paradise.onrender.com/](https://eleni-recipe-paradise.onrender.com/)  
+**Live Site:** [https://eleni-recipe-paradise.onrender.com/](https://eleni-recipe-paradise.onrender.com/)  
 **Project Details:** [View full case study](https://elenisalamouri.co.uk/elenis-recipe-paradise/)
 
 <i>Preview of a shrimp pasta recipe</i>
@@ -91,8 +91,8 @@ Render • Git • npm
 
 ```
 Recipe-app/
-├── cloudinary/      # Image upload configuration
-├── controllers/     # Business logic and CRUD operations
+├── cloudinary/       # Image upload configuration
+├── controllers/      # Business logic and CRUD operations
 ├── helper/          # Utility functions and helpers
 ├── models/          # MongoDB schemas and data models
 ├── public/          # Static assets (CSS, JavaScript, images)
@@ -110,13 +110,13 @@ Recipe-app/
 ## 🔧 Key Technical Implementations
 
 ### Unit Conversion System
-Implemented real-time unit conversion using the `convert-units` library. All data is stored in metric units in the database, with imperial conversions happening on-the-fly during display, optimizing storage space and ensuring data consistency.
+Implemented real-time unit conversion using the `convert-units` library. All data is stored in metric units in the database, with imperial conversions happening on-the-fly during display, optimising storage space and ensuring data consistency.
 
 ### Authentication & Authorization
 Built custom middleware for user authentication and authorization, ensuring users can view all recipes but only edit their own. Session management handles user state across the application.
 
 ### Image Management
-Integrated Cloudinary for efficient image upload, storage, and optimization. Users can upload recipe photos that are automatically processed and served via CDN.
+Integrated Cloudinary for efficient image upload, storage, and optimisation. Users can upload recipe photos that are automatically processed and served via CDN.
 
 ## 📊 Results & Impact
 
