@@ -107,9 +107,31 @@ Recipe-app/
 └── package.json     # Dependencies and scripts
 ```
 
-## 🔧 Key Technical Implementations
+## 📦 Key Dependencies
 
-### Unit Conversion System
+**Core Framework:**
+- Express.js - Web application framework
+- Mongoose - MongoDB object modeling
+- EJS & EJS-Mate - Template engine and layout support
+
+**Authentication & Security:**
+- Passport.js & Passport-Local-Mongoose - User authentication
+- Helmet - Security middleware
+- Express-Mongo-Sanitize - Input sanitization
+
+**File Upload & Storage:**
+- Cloudinary - Image upload and optimization
+- Multer - File upload handling
+
+**Maps & Location:**
+- Mapbox SDK & Mapbox GL - Interactive maps and geolocation
+
+**Utilities:**
+- Convert-Units - Measurement conversions
+- Joi - Data validation
+- Method-Override - HTTP verb support
+
+## 🔧 Key Technical Implementations
 Implemented real-time unit conversion using the `convert-units` library. All data is stored in metric units in the database, with imperial conversions happening on-the-fly during display, optimising storage space and ensuring data consistency.
 
 ### Authentication & Authorisation
