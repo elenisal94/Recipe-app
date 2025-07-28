@@ -91,8 +91,8 @@ Render • Git • npm
 
 ```
 Recipe-app/
-├── cloudinary/       # Image upload configuration
-├── controllers/      # Business logic and CRUD operations
+├── cloudinary/      # Image upload configuration
+├── controllers/     # Business logic and CRUD operations
 ├── helper/          # Utility functions and helpers
 ├── models/          # MongoDB schemas and data models
 ├── public/          # Static assets (CSS, JavaScript, images)
