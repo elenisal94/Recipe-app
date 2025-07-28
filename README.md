@@ -37,7 +37,7 @@ Render • Git • npm
 
 ## ✨ Key Features
 
-- **User Authentication & Authorization** - Secure signup/login with session management
+- **User Authentication & Authorisation** - Secure signup/login with session management
 - **Recipe CRUD Operations** - Create, read, update, and delete recipes
 - **Rating System** - Users can rate and review each other's recipes
 - **Real-time Unit Conversion** - Seamless conversion between metric and imperial units
@@ -112,8 +112,8 @@ Recipe-app/
 ### Unit Conversion System
 Implemented real-time unit conversion using the `convert-units` library. All data is stored in metric units in the database, with imperial conversions happening on-the-fly during display, optimising storage space and ensuring data consistency.
 
-### Authentication & Authorization
-Built custom middleware for user authentication and authorization, ensuring users can view all recipes but only edit their own. Session management handles user state across the application.
+### Authentication & Authorisation
+Built custom middleware for user authentication and authorisation, ensuring users can view all recipes but only edit their own. Session management handles user state across the application.
 
 ### Image Management
 Integrated Cloudinary for efficient image upload, storage, and optimisation. Users can upload recipe photos that are automatically processed and served via CDN.
