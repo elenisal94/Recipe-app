@@ -98,7 +98,6 @@ Recipe-app/
 ├── public/          # Static assets (CSS, JavaScript, images)
 ├── routes/          # Express route handlers
 ├── seeds/           # Database seeding scripts
-├── uploads/         # File upload handling
 ├── utils/           # Utility functions
 ├── views/           # EJS templates and layouts
 ├── app.js           # Main application entry point
