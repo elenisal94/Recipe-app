@@ -2,7 +2,6 @@
 
 A recipe sharing platform for friends around the world to share their favourite dishes, discover new recipes, and rate each other's culinary creations.
 
-**Live Site:** [https://eleni-recipe-paradise.onrender.com/](https://eleni-recipe-paradise.onrender.com/)  
 **Project Details:** [View full case study](https://elenisalamouri.co.uk/elenis-recipe-paradise/)
 
 <i>Preview of a shrimp pasta recipe</i>
